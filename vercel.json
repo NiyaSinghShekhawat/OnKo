@@ -3,6 +3,10 @@
     {
       "path": "/api/internal/reminders",
       "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/internal/notifications/whatsapp",
+      "schedule": "0 * * * *"
     }
   ]
 }
