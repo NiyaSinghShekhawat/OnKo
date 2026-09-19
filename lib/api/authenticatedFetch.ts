@@ -5,6 +5,6 @@ export async function authenticatedFetch(input: RequestInfo | URL, init: Request
   const user = auth.currentUser;
   if (!user) throw new Error("Please sign in to access patient data.");
   const headers = new Headers(init.headers);
-  headers.set("Authorization", `Bearer ${await getIdToken(user)}`);
+  headers.set("Authorization", `Bearer ${await getIdToken(user, true)}`);
   return fetch(input, { ...init, headers, cache: "no-store" });
 }
