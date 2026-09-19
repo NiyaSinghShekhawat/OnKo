@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigation = [
-  ["Overview / Today","/patient","⌂"],["My Care Journey","/patient/care-journey","◌"],["Treatment Details","/patient/treatment","✦"],["My Medicines","/patient/medicines","＋"],["Ask Care Team","/patient/queries","?"],["Reports & Records","/patient/reports","▤"],["Caregiver & Access","/patient/caregiver","♧"],["Notifications & SOS","/patient/notifications","!"],["Community","/patient/community","◉"],
+  ["Overview / Today","/patient","⌂"],["My Care Journey","/patient/care-journey","◌"],["Treatment Details","/patient/treatment","✦"],["My Medicines","/patient/medicines","＋"],["Ask Care Team","/patient/queries","?"] ,["OnKo AI Companion","/patient/ai","✦"],["Reports & Records","/patient/reports","▤"],["Caregiver & Access","/patient/caregiver","♧"],["Notifications & SOS","/patient/notifications","!"],["Community","/patient/community","◉"],
 ];
 
 export function PatientSidebar() {

@@ -1,0 +1,13 @@
+"use client";
+import {useState} from "react";
+import {askPatientCompanion} from "@/lib/api/patientAI";
+type Message={role:"patient"|"ai";text:string;evidence?:string[];limitations?:string[]};
+export default function PatientAICompanion(){
+ const [messages,setMessages]=useState<Message[]>([]);
+ const [draft,setDraft]=useState(""); const [loading,setLoading]=useState(false); const [error,setError]=useState<string|null>(null);
+ async function send(){const q=draft.trim();if(!q||loading)return;setMessages(x=>[...x,{role:"patient",text:q}]);setDraft("");setError(null);setLoading(true);try{const r=await askPatientCompanion(q);setMessages(x=>[...x,{role:"ai",text:r.output.answer,evidence:r.output.evidence,limitations:r.output.limitations}]);}catch(e){setError(e instanceof Error?e.message:"Unable to contact the AI companion.");}finally{setLoading(false);}}
+ return <section className="patient-card ai-companion-card"><div className="patient-card-heading"><div><span className="patient-eyebrow">ONKO AI COMPANION</span><h1 className="onko-page-title">Your care-journey companion</h1><p className="onko-page-subtitle">Ask about information already recorded in your OnKo care journey, appointments, medicines, procedures, or milestones.</p></div><span className="ai-companion-badge">AI · CARE JOURNEY</span></div>
+ <div className="ai-companion-notice"><strong>AI support, not clinical advice</strong><span>This companion does not diagnose, interpret reports, prescribe, or change treatment. For clinical decisions, contact your care team.</span></div>
+ <div className="ai-companion-messages">{messages.length?messages.map((m,i)=><article key={i} className={`ai-companion-message ${m.role}`}><span>{m.role==="patient"?"You":"OnKo AI"}</span><p>{m.text}</p>{m.role==="ai"&&m.evidence?.length?<div className="ai-companion-evidence"><strong>Based on your record</strong>{m.evidence.map((e,j)=><span key={j}>• {e}</span>)}</div>:null}{m.role==="ai"&&m.limitations?.length?<div className="ai-companion-limitations"><strong>Important</strong>{m.limitations.map((x,j)=><span key={j}>• {x}</span>)}</div>:null}</article>):<div className="ai-companion-empty"><strong>Ask your first question</strong><span>For example: “When is my next appointment?” or “What milestones are currently pending?”</span></div>}</div>
+ <div className="ai-companion-composer"><textarea value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}} placeholder="Ask about your recorded care journey…" rows={3}/><button onClick={send} disabled={!draft.trim()||loading}>{loading?"Thinking…":"Ask OnKo AI"}</button></div>{error&&<p className="patient-directory-error">{error}</p>}</section>;
+}
