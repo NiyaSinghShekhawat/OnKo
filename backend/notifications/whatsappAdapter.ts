@@ -1,0 +1,3 @@
+import type {Notification} from "@/types/notification";
+export interface WhatsAppDeliveryResult{status:"queued"|"sent"|"not-configured"|"failed";channel:"whatsapp";notificationId:string;reason?:string}
+export async function sendWhatsAppNotification(notification:Notification):Promise<WhatsAppDeliveryResult>{if(!process.env.WHATSAPP_ACCESS_TOKEN||!process.env.WHATSAPP_PHONE_NUMBER_ID)return {status:"not-configured",channel:"whatsapp",notificationId:notification.notificationId,reason:"WhatsApp Business credentials are not configured."};return {status:"queued",channel:"whatsapp",notificationId:notification.notificationId,reason:"WhatsApp provider transport is reserved for the approved Business Platform integration."}}

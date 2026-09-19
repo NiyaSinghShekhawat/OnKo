@@ -1,0 +1,2 @@
+import type {Notification} from "@/types/notification";import {sendWhatsAppNotification} from "@/backend/notifications/whatsappAdapter";
+export async function deliverNotification(notification:Notification){if(notification.channel==="whatsapp")return sendWhatsAppNotification(notification);return {status:"queued" as const,channel:"in-app" as const,notificationId:notification.notificationId};}
