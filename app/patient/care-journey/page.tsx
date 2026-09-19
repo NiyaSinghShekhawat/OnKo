@@ -1,6 +1,8 @@
 "use client";
 import { PatientShell } from "@/patient-dashboard/components/PatientShell";
 import { usePatientContext } from "@/app/patient/data-provider";
+import { completePatientMilestone } from "@/lib/api/patientMilestone";
+import { useState } from "react";
 
 const labels: Record<string,string> = {
   "active-treatment":"Active Treatment",
@@ -13,6 +15,21 @@ const labels: Record<string,string> = {
 
 export default function CareJourneyPage() {
   const { patient, careJourneys, milestones, loading, error } = usePatientContext();
+  const [completing, setCompleting] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  async function completeMilestone(milestoneId: string) {
+    try {
+      setCompleting(milestoneId);
+      setActionError(null);
+      await completePatientMilestone(milestoneId);
+      window.location.reload();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : "Unable to complete milestone.");
+    } finally {
+      setCompleting(null);
+    }
+  }
   const journey = careJourneys[0];
   const progress = journey?.progressPercent ?? patient?.journeyProgress ?? 0;
   const currentState = journey?.currentState ?? patient?.currentCarePhase;
@@ -42,7 +59,8 @@ export default function CareJourneyPage() {
 
     <section className="patient-card">
       <div className="patient-card-heading"><div><span className="patient-eyebrow">MILESTONES</span><h2 className="journey-section-title">Your care timeline</h2></div><span className="patient-time">{milestones.length} records</span></div>
-      {loading ? <p className="patient-muted">Loading your care journey…</p> : milestones.length ? <div className="clinical-list">{milestones.map((m)=><article className="clinical-list-item" key={m.milestoneId}><div className="clinical-icon">{m.status === "completed" ? "✓" : "○"}</div><div className="clinical-main"><div className="clinical-title-row"><div><h3>{m.title}</h3><span>Due {m.dueDate}</span></div><span className={`clinical-status clinical-status--${m.status === "completed" ? "done" : "scheduled"}`}>{m.status}</span></div>{m.description && <p>{m.description}</p>}</div></article>)}</div> : <p className="patient-muted">No milestones have been added to your care journey yet.</p>}
+      {actionError && <p className="patient-directory-error">{actionError}</p>}
+      {loading ? <p className="patient-muted">Loading your care journey…</p> : milestones.length ? <div className="clinical-list">{milestones.map((m)=><article className="clinical-list-item" key={m.milestoneId}><div className="clinical-icon">{m.status === "completed" ? "✓" : "○"}</div><div className="clinical-main"><div className="clinical-title-row"><div><h3>{m.title}</h3><span>Due {m.dueDate}</span></div><span className={`clinical-status clinical-status--${m.status === "completed" ? "done" : "scheduled"}`}>{m.status}</span></div>{m.description && <p>{m.description}</p>}{m.status === "pending" && <button type="button" className="report-view-button" onClick={() => completeMilestone(m.milestoneId)} disabled={completing === m.milestoneId}>{completing === m.milestoneId ? "Saving…" : "Mark complete"}</button>}</div></article>)}</div> : <p className="patient-muted">No milestones have been added to your care journey yet.</p>}
     </section>
 
     <section className="patient-safety-alert"><span className="patient-alert-icon">i</span><div><strong>Clinician-controlled journey</strong><span>Care stages and milestone status are recorded by the care team. OnKo displays this information and does not independently infer or change your clinical journey state.</span></div></section>
