@@ -1,2 +1,1 @@
-import {NextRequest} from "next/server";import {requireDoctor} from "@/backend/api/auth";import {getCareJourneySummary} from "@/backend/services/careJourneySummaryService";
-export async function getDoctorCareJourneySummary(req:NextRequest,patientId:string){const auth=await requireDoctor(req);return getCareJourneySummary(patientId,auth.doctorId)}
+import {NextRequest} from "next/server";import {requireDoctor} from "@/backend/api/auth";import {getCareJourneySummary} from "@/backend/services/careJourneySummaryService";export async function getDoctorCareJourneySummary(req:NextRequest,patientId:string){const auth=await requireDoctor(req);if("error"in auth)throw new Error("Doctor authentication required.");return getCareJourneySummary(patientId,auth.doctorId);}
