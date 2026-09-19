@@ -1,0 +1,3 @@
+import type { Procedure } from "@/types/procedure"; import { authenticatedFetch } from "./authenticatedFetch";
+export async function createDoctorProcedure(input:Omit<Procedure,"procedureId">):Promise<Procedure>{const r=await authenticatedFetch("/api/doctor/procedures",{method:"POST",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to save procedure.");return(await r.json()).data}
+export async function updateDoctorProcedure(input:Partial<Procedure>&{procedureId:string}):Promise<Procedure>{const r=await authenticatedFetch("/api/doctor/procedures",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to update procedure.");return(await r.json()).data}

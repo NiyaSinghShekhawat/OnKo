@@ -1,0 +1,3 @@
+import type { Medicine } from "@/types/medicine"; import { authenticatedFetch } from "./authenticatedFetch";
+export async function createDoctorMedicine(input:Omit<Medicine,"medicineId">):Promise<Medicine>{const r=await authenticatedFetch("/api/doctor/medicines",{method:"POST",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to save medicine.");return(await r.json()).data}
+export async function updateDoctorMedicine(input:Partial<Medicine>&{medicineId:string}):Promise<Medicine>{const r=await authenticatedFetch("/api/doctor/medicines",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to update medicine.");return(await r.json()).data}
