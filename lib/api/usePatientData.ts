@@ -7,6 +7,9 @@ import type { Medicine } from "@/types/medicine";
 import type { Query } from "@/types/query";
 import type { Report } from "@/types/report";
 import type { CareJourney } from "@/types/careJourney";
+import type { Procedure } from "@/types/procedure";
+import type { Milestone } from "@/types/milestone";
+import { auth } from "@/lib/firebase/client";
 import {
   fetchPatients,
   fetchAppointments,
@@ -14,6 +17,8 @@ import {
   fetchQueries,
   fetchReports,
   fetchCareJourneys,
+  fetchProcedures,
+  fetchMilestones,
 } from "@/lib/api";
 
 export interface PatientDataState {
@@ -23,64 +28,43 @@ export interface PatientDataState {
   queries: Query[];
   reports: Report[];
   careJourneys: CareJourney[];
+  procedures: Procedure[];
+  milestones: Milestone[];
   loading: boolean;
   error: string | null;
 }
 
 export function usePatientData(): PatientDataState {
   const [state, setState] = useState<PatientDataState>({
-    patient: null,
-    appointments: [],
-    medicines: [],
-    queries: [],
-    reports: [],
-    careJourneys: [],
-    loading: true,
-    error: null,
+    patient: null, appointments: [], medicines: [], queries: [], reports: [],
+    careJourneys: [], procedures: [], milestones: [], loading: true, error: null,
   });
 
   useEffect(() => {
     let active = true;
-
-    async function load() {
+    const unsubscribe = auth.onIdTokenChanged(async (user) => {
+      if (!user) {
+        if (active) setState((current) => ({ ...current, loading: false, error: "Please sign in." }));
+        return;
+      }
       try {
-        const [patients, appointments, medicines, queries, reports, careJourneys] =
+        const [patients, appointments, medicines, queries, reports, careJourneys, procedures, milestones] =
           await Promise.all([
-            fetchPatients(),
-            fetchAppointments(),
-            fetchMedicines(),
-            fetchQueries(),
-            fetchReports(),
-            fetchCareJourneys(),
+            fetchPatients(), fetchAppointments(), fetchMedicines(), fetchQueries(),
+            fetchReports(), fetchCareJourneys(), fetchProcedures(), fetchMilestones(),
           ]);
-
         if (!active) return;
-
         setState({
-          patient: patients[0] ?? null,
-          appointments,
-          medicines,
-          queries,
-          reports,
-          careJourneys,
-          loading: false,
-          error: null,
+          patient: patients[0] ?? null, appointments, medicines, queries, reports,
+          careJourneys, procedures, milestones, loading: false, error: null,
         });
       } catch (error) {
         if (!active) return;
         console.error("Patient data load failed", error);
-        setState((current) => ({
-          ...current,
-          loading: false,
-          error: "Unable to load patient data right now.",
-        }));
+        setState((current) => ({ ...current, loading: false, error: "Unable to load your care data right now." }));
       }
-    }
-
-    load();
-    return () => {
-      active = false;
-    };
+    });
+    return () => { active = false; unsubscribe(); };
   }, []);
 
   return state;
