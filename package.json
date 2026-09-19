@@ -1,6 +1,6 @@
 {
   "name":"onko","version":"0.1.0","private":true,
   "scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"next lint","provision:patient":"tsx backend/scripts/provisionPatient.ts","seed:demo":"tsx backend/scripts/seedDemoPatient.ts"},
-  "dependencies":{"firebase":"^12.2.1","firebase-admin":"^13.5.0","next":"latest","react":"latest","react-dom":"latest","firebase-admin":"^13.5.0"},
+  "dependencies":{"firebase":"^12.2.1","firebase-admin":"^13.5.0","next":"latest","react":"latest","react-dom":"latest"},
   "devDependencies":{"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","tsx":"^4.20.3","typescript":"latest"}
 }
