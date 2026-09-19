@@ -11,13 +11,11 @@
   --onko-red: #b4232f;
   --onko-red-soft: #fff0f1;
 }
-
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
 body { background: var(--onko-bg); color: var(--onko-ink); font-family: Inter, Arial, sans-serif; }
 button, input, textarea { font: inherit; }
 a { color: inherit; text-decoration: none; }
-
 .onko-patient-shell { min-height: 100vh; display: grid; grid-template-columns: 224px minmax(0, 1fr); }
 .onko-sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 20px 14px; background: #fff; border-right: 1px solid var(--onko-line); }
 .onko-brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 24px; }
@@ -39,56 +37,43 @@ a { color: inherit; text-decoration: none; }
 .onko-status { color: #2f6e57; font-size: 10px; font-weight: 600; }
 .onko-avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #e4eeee; font-size: 11px; font-weight: 700; }
 .onko-page { padding: 20px 28px 36px; max-width: 1440px; margin: 0 auto; display: grid; gap: 14px; }
-
-.patient-welcome-card { display: flex; justify-content: space-between; gap: 20px; padding: 20px; background: #fff; border: 1px solid var(--onko-line); border-radius: 11px; }
-.patient-eyebrow { display: block; color: #628087; font-size: 8px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
-.patient-welcome-card h2 { margin: 7px 0 5px; font-size: 22px; letter-spacing: -.035em; }
-.patient-welcome-card p { margin: 0; color: var(--onko-muted); font-size: 11px; }
-.patient-meta-row { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 13px; color: var(--onko-muted); font-size: 9px; }
-.patient-chip { padding: 4px 7px; border-radius: 5px; background: var(--onko-teal-soft); color: var(--onko-teal); font-weight: 600; }
-.patient-doctor-summary { min-width: 215px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: #f7faf9; }
-.patient-icon-badge { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; background: var(--onko-teal); color: #fff; }
-.patient-doctor-summary strong, .patient-doctor-summary span { display: block; }
-.patient-doctor-summary strong { font-size: 9px; }
-.patient-doctor-summary span:last-child { margin-top: 3px; color: var(--onko-muted); font-size: 10px; }
-
 .patient-card { background: #fff; border: 1px solid var(--onko-line); border-radius: 10px; padding: 15px; }
+.patient-eyebrow { display: block; color: #628087; font-size: 8px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
 .patient-card-heading { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
-.patient-card h3 { margin: 5px 0 0; font-size: 13px; letter-spacing: -.015em; }
+.patient-card h3 { margin: 5px 0 0; font-size: 13px; }
 .patient-time, .patient-muted { color: var(--onko-muted); font-size: 9px; }
-.doctor-update-card { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; }
-.doctor-update-card p { margin: 0; grid-column: 1 / -1; color: #56686c; font-size: 10px; line-height: 1.6; }
-.patient-secondary-button, .patient-outline-button, .patient-primary-button, .patient-emergency-button, .patient-sos-button, .patient-link-button { border: 0; cursor: pointer; font-size: 9px; font-weight: 600; }
-.patient-secondary-button { justify-self: end; padding: 7px 10px; border: 1px solid var(--onko-line); border-radius: 6px; background: #fff; color: var(--onko-teal); }
-.patient-today-grid { display: grid; grid-template-columns: 1.05fr 1fr .9fr; gap: 12px; }
-.care-card { min-height: 190px; display: flex; flex-direction: column; }
-.patient-status-dot { color: #2f6e57; font-size: 8px; font-weight: 600; }
-.patient-detail-line { margin-top: 12px; font-size: 10px; font-weight: 600; }
-.patient-action-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: auto; padding-top: 14px; color: var(--onko-muted); font-size: 9px; }
-.patient-link-button { padding: 0; background: transparent; color: var(--onko-teal); }
-.patient-progress-mini { padding: 4px 7px; background: var(--onko-teal-soft); color: var(--onko-teal); border-radius: 5px; font-size: 8px; font-weight: 700; }
-.dose-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 13px; padding-top: 11px; border-top: 1px solid #edf1f1; }
-.dose-row strong, .dose-row span { display: block; }
-.dose-row strong { font-size: 9px; }
-.dose-row span { margin-top: 3px; color: var(--onko-muted); font-size: 8px; }
-.dose-complete { color: #2f6e57 !important; font-weight: 700; }
-.patient-outline-button { padding: 6px 8px; border: 1px solid var(--onko-teal); border-radius: 5px; background: #fff; color: var(--onko-teal); }
-.care-card > p { margin: 12px 0 0; color: var(--onko-muted); font-size: 9px; line-height: 1.5; }
-.checkin-progress { height: 6px; margin-top: 16px; overflow: hidden; border-radius: 99px; background: #e8eeee; }
-.checkin-progress span { display: block; height: 100%; border-radius: inherit; background: var(--onko-teal); }
-.patient-primary-button { width: 100%; margin-top: 12px; padding: 9px; border-radius: 6px; background: var(--onko-teal); color: #fff; }
-.patient-safety-alert { display: flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1px solid #f1c9cd; border-radius: 8px; background: var(--onko-red-soft); color: #7e2730; }
-.patient-alert-icon { width: 22px; height: 22px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: var(--onko-red); color: #fff; font-weight: 700; font-size: 11px; }
+.onko-page-title { margin: 7px 0 5px; font-size: 24px; letter-spacing: -.04em; }
+.onko-page-subtitle { margin: 0; color: var(--onko-muted); font-size: 11px; line-height: 1.6; }
+.journey-hero { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.journey-progress-ring { width: 94px; height: 94px; flex: 0 0 auto; display: grid; place-items: center; align-content: center; border-radius: 50%; background: conic-gradient(var(--onko-teal) 68%, #e5eeee 0); position: relative; color: #fff; }
+.journey-progress-ring::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: #fff; }
+.journey-progress-ring strong, .journey-progress-ring span { position: relative; z-index: 1; color: var(--onko-teal); }
+.journey-progress-ring strong { font-size: 17px; }
+.journey-progress-ring span { margin-top: 2px; font-size: 7px; text-transform: uppercase; letter-spacing: .04em; }
+.journey-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.journey-metric { display: block; margin: 7px 0 4px; font-size: 17px; letter-spacing: -.02em; }
+.journey-section-title { margin: 5px 0 0; font-size: 15px; }
+.journey-timeline-card { padding: 18px; }
+.journey-timeline { position: relative; margin-top: 18px; }
+.journey-timeline::before { content: ""; position: absolute; left: 10px; top: 10px; bottom: 10px; width: 1px; background: #d9e4e5; }
+.journey-item { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; padding-bottom: 19px; }
+.journey-item:last-child { padding-bottom: 0; }
+.journey-marker { width: 21px; height: 21px; display: grid; place-items: center; position: relative; z-index: 1; border: 1px solid #d4e0e1; border-radius: 50%; background: #fff; color: #8da0a4; font-size: 9px; }
+.journey-item--completed .journey-marker { border-color: var(--onko-teal); background: var(--onko-teal); color: #fff; }
+.journey-item--current .journey-marker { border-color: var(--onko-teal); color: var(--onko-teal); box-shadow: 0 0 0 4px var(--onko-teal-soft); }
+.journey-content { padding-bottom: 1px; }
+.journey-item-top { display: flex; justify-content: space-between; gap: 10px; }
+.journey-item h3 { margin: 4px 0 0; font-size: 11px; }
+.journey-item time { color: var(--onko-muted); font-size: 9px; }
+.journey-item p { margin: 5px 0 0; color: var(--onko-muted); font-size: 9px; line-height: 1.5; }
+.journey-status { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--onko-muted); }
+.journey-item--current .journey-status { color: var(--onko-teal); }
+.journey-note { margin-top: 0; }
+.patient-safety-alert { display: flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1px solid #d5e5e6; border-radius: 8px; background: var(--onko-teal-soft); color: var(--onko-teal); }
+.patient-alert-icon { width: 22px; height: 22px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: var(--onko-teal); color: #fff; font-weight: 700; font-size: 11px; }
 .patient-safety-alert strong, .patient-safety-alert span { display: block; }
 .patient-safety-alert strong { font-size: 9px; }
 .patient-safety-alert span { margin-top: 2px; font-size: 8px; line-height: 1.4; }
-.patient-emergency-button { margin-left: auto; flex: 0 0 auto; padding: 7px 10px; border-radius: 6px; background: var(--onko-red); color: #fff; }
-.patient-quick-nav { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--onko-line); border-radius: 8px; background: #fff; }
-.patient-quick-nav > div { display: flex; flex-wrap: wrap; gap: 5px; }
-.patient-quick-link { padding: 5px 7px; border-radius: 5px; background: #f3f7f7; color: #52676b; font-size: 8px; }
-.patient-quick-link:hover { background: var(--onko-teal-soft); color: var(--onko-teal); }
-.patient-sos-button { margin-left: auto; padding: 7px 9px; border-radius: 5px; background: var(--onko-red); color: #fff; }
-
 @media (max-width: 900px) {
   .onko-patient-shell { grid-template-columns: 76px minmax(0, 1fr); }
   .onko-sidebar { padding: 16px 8px; }
@@ -97,8 +82,6 @@ a { color: inherit; text-decoration: none; }
   .onko-sidebar-link { justify-content: center; padding-inline: 0; }
   .onko-topbar { padding-inline: 18px; }
   .onko-page { padding-inline: 18px; }
-  .patient-today-grid { grid-template-columns: 1fr 1fr; }
-  .patient-today-grid .care-card:last-child { grid-column: 1 / -1; }
 }
 @media (max-width: 620px) {
   .onko-patient-shell { display: block; }
@@ -109,12 +92,7 @@ a { color: inherit; text-decoration: none; }
   .onko-brand-copy, .onko-section-label { display: block; }
   .onko-sidebar-link span:not(.onko-sidebar-icon) { display: inline; }
   .onko-page { padding: 14px; }
-  .patient-welcome-card, .patient-quick-nav { flex-direction: column; align-items: stretch; }
-  .patient-doctor-summary { min-width: 0; }
-  .doctor-update-card { grid-template-columns: 1fr; }
-  .patient-secondary-button { justify-self: start; }
-  .patient-today-grid { grid-template-columns: 1fr; }
-  .patient-today-grid .care-card:last-child { grid-column: auto; }
-  .patient-safety-alert { align-items: flex-start; flex-wrap: wrap; }
-  .patient-emergency-button { margin-left: 32px; }
+  .journey-hero { align-items: flex-start; }
+  .journey-summary-grid { grid-template-columns: 1fr; }
+  .journey-item-top { flex-direction: column; gap: 3px; }
 }
