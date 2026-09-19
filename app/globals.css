@@ -17,3 +17,62 @@
 .onko-capitalize{text-transform:capitalize}.patient-welcome-card{display:flex;justify-content:space-between;gap:20px;padding:20px;background:#fff;border:1px solid var(--onko-line);border-radius:11px}.patient-welcome-card h2{margin:7px 0 5px;font-size:22px;letter-spacing:-.035em}.patient-welcome-card p{margin:0;color:var(--onko-muted);font-size:11px}.patient-meta-row{display:flex;flex-wrap:wrap;gap:7px 14px;margin-top:13px;color:var(--onko-muted);font-size:9px}.patient-chip{padding:4px 7px;border-radius:5px;background:var(--onko-teal-soft);color:var(--onko-teal);font-weight:600}.patient-doctor-summary{min-width:215px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:#f7faf9}.patient-icon-badge{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;background:var(--onko-teal);color:#fff}.patient-doctor-summary strong,.patient-doctor-summary span{display:block}.patient-doctor-summary strong{font-size:9px}.patient-doctor-summary span:last-child{margin-top:3px;color:var(--onko-muted);font-size:10px}.doctor-update-card{display:grid;grid-template-columns:1fr auto;gap:8px 16px}.doctor-update-card p{margin:0;grid-column:1/-1;color:#56686c;font-size:10px;line-height:1.6}.patient-secondary-button,.patient-outline-button,.patient-primary-button,.patient-emergency-button,.patient-sos-button,.patient-link-button{border:0;cursor:pointer;font-size:9px;font-weight:600}.patient-secondary-button{justify-self:end;padding:7px 10px;border:1px solid var(--onko-line);border-radius:6px;background:#fff;color:var(--onko-teal)}.patient-today-grid{display:grid;grid-template-columns:1.05fr 1fr .9fr;gap:12px}.care-card{min-height:190px;display:flex;flex-direction:column}.patient-status-dot{color:#2f6e57;font-size:8px;font-weight:600}.patient-detail-line{margin-top:12px;font-size:10px;font-weight:600}.patient-action-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:14px;color:var(--onko-muted);font-size:9px}.patient-link-button{padding:0;background:transparent;color:var(--onko-teal)}.patient-progress-mini{padding:4px 7px;background:var(--onko-teal-soft);color:var(--onko-teal);border-radius:5px;font-size:8px;font-weight:700}.dose-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:13px;padding-top:11px;border-top:1px solid #edf1f1}.dose-row strong,.dose-row span{display:block}.dose-row strong{font-size:9px}.dose-row span{margin-top:3px;color:var(--onko-muted);font-size:8px}.dose-complete{color:#2f6e57!important;font-weight:700}.patient-outline-button{padding:6px 8px;border:1px solid var(--onko-teal);border-radius:5px;background:#fff;color:var(--onko-teal)}.care-card>p{margin:12px 0 0;color:var(--onko-muted);font-size:9px;line-height:1.5}.checkin-progress{height:6px;margin-top:16px;overflow:hidden;border-radius:99px;background:#e8eeee}.checkin-progress span{display:block;height:100%;border-radius:inherit;background:var(--onko-teal)}.patient-primary-button{width:100%;margin-top:12px;padding:9px;border-radius:6px;background:var(--onko-teal);color:#fff}.patient-quick-nav{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--onko-line);border-radius:8px;background:#fff}.patient-quick-nav>div{display:flex;flex-wrap:wrap;gap:5px}.patient-quick-link{padding:5px 7px;border-radius:5px;background:#f3f7f7;color:#52676b;font-size:8px}.patient-quick-link:hover{background:var(--onko-teal-soft);color:var(--onko-teal)}.patient-sos-button{margin-left:auto;padding:7px 9px;border-radius:5px;background:var(--onko-red);color:#fff}.patient-safety-alert{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #f1c9cd;border-radius:8px;background:var(--onko-red-soft);color:#7e2730}.patient-alert-icon{width:22px;height:22px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:var(--onko-red);color:#fff;font-weight:700;font-size:11px}.patient-safety-alert strong,.patient-safety-alert span{display:block}.patient-safety-alert strong{font-size:9px}.patient-safety-alert span{margin-top:2px;font-size:8px;line-height:1.4}.patient-emergency-button{margin-left:auto;flex:0 0 auto;padding:7px 10px;border-radius:6px;background:var(--onko-red);color:#fff}
 @media(max-width:900px){.patient-today-grid{grid-template-columns:1fr 1fr}.patient-today-grid .care-card:last-child{grid-column:1/-1}}
 @media(max-width:620px){.patient-welcome-card,.patient-quick-nav{flex-direction:column;align-items:stretch}.patient-doctor-summary{min-width:0}.doctor-update-card{grid-template-columns:1fr}.patient-secondary-button{justify-self:start}.patient-today-grid{grid-template-columns:1fr}.patient-today-grid .care-card:last-child{grid-column:auto}.patient-safety-alert{align-items:flex-start;flex-wrap:wrap}.patient-emergency-button{margin-left:32px}}
+
+/* Doctor dashboard foundation */
+.doctor-shell{min-height:100vh;display:grid;grid-template-columns:240px minmax(0,1fr);background:#f6f9f9;color:var(--onko-ink)}
+.doctor-sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 14px;background:#fff;border-right:1px solid var(--onko-line)}
+.doctor-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 24px}
+.doctor-brand-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--onko-teal);color:#fff;font-weight:700}
+.doctor-brand-name{font-weight:700;letter-spacing:-.02em}
+.doctor-brand-subtitle{color:var(--onko-muted);font-size:10px;margin-top:2px}
+.doctor-section-label{padding:8px 10px;color:var(--onko-muted);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.doctor-sidebar-nav{display:grid;gap:4px}
+.doctor-sidebar-link{display:flex;align-items:center;gap:10px;min-height:38px;padding:8px 10px;border-radius:8px;color:#516266;font-size:12px;font-weight:500}
+.doctor-sidebar-link:hover{background:#f1f6f6;color:var(--onko-ink)}
+.doctor-sidebar-link.active{background:var(--onko-teal);color:#fff}
+.doctor-sidebar-icon{width:18px;text-align:center;font-size:13px}
+.doctor-security{margin-top:auto;padding:10px;border:1px solid var(--onko-line);border-radius:9px;color:var(--onko-muted);font-size:9px;line-height:1.5}
+.doctor-security strong{display:block;color:var(--onko-ink);margin-bottom:3px}
+.doctor-security span{display:block}
+.doctor-main{min-width:0}
+.doctor-topbar{min-height:86px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 30px;background:#fff;border-bottom:1px solid var(--onko-line)}
+.doctor-breadcrumb{color:var(--onko-muted);font-size:10px}
+.doctor-breadcrumb span{padding:0 5px;color:#a0abad}
+.doctor-topbar h1{margin:7px 0 3px;font-size:21px;letter-spacing:-.035em}
+.doctor-topbar p{margin:0;color:var(--onko-muted);font-size:10px}
+.doctor-header-actions{display:flex;align-items:center;gap:14px}
+.doctor-icon-button{width:34px;height:34px;border:1px solid var(--onko-line);border-radius:8px;background:#fff;color:var(--onko-ink);cursor:pointer}
+.doctor-identity{display:flex;align-items:center;gap:9px}
+.doctor-avatar{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#e4eeee;color:var(--onko-teal);font-size:9px;font-weight:800}
+.doctor-identity strong,.doctor-identity span{display:block}
+.doctor-identity strong{font-size:9px}
+.doctor-identity span{margin-top:2px;color:var(--onko-muted);font-size:8px}
+.doctor-page{padding:22px 30px 36px;max-width:1480px;margin:0 auto;display:grid;gap:14px}
+.doctor-welcome-card{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding:18px;background:#fff;border:1px solid var(--onko-line);border-radius:10px}
+.doctor-eyebrow{display:block;color:#628087;font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.doctor-welcome-card h2{margin:7px 0 5px;font-size:18px;letter-spacing:-.03em}
+.doctor-welcome-card p{max-width:680px;margin:0;color:var(--onko-muted);font-size:10px;line-height:1.55}
+.doctor-flow-badge,.doctor-neutral-pill{display:inline-flex;align-items:center;padding:6px 9px;border-radius:99px;background:var(--onko-teal-soft);color:var(--onko-teal);font-size:7px;font-weight:800;white-space:nowrap}
+.doctor-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.doctor-card{background:#fff;border:1px solid var(--onko-line);border-radius:10px;padding:15px}
+.doctor-metric-card{min-height:118px}
+.doctor-metric-card>span{display:block;color:var(--onko-muted);font-size:9px;font-weight:600}
+.doctor-metric-card>strong{display:block;margin-top:12px;font-size:25px;letter-spacing:-.04em}
+.doctor-metric-card>small{display:block;margin-top:5px;color:#819093;font-size:8px;line-height:1.4}
+.doctor-content-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:12px}
+.doctor-card-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.doctor-card h2{margin:6px 0 0;font-size:14px}
+.doctor-review-list{display:grid;gap:8px;margin-top:14px}
+.doctor-review-item{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:11px;border:1px solid #edf1f1;border-radius:8px}
+.doctor-review-number{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:var(--onko-teal-soft);color:var(--onko-teal);font-size:8px;font-weight:800}
+.doctor-review-item strong{font-size:10px}
+.doctor-review-item p{margin:4px 0 0;color:var(--onko-muted);font-size:8px;line-height:1.45}
+.doctor-ai-card{display:flex;flex-direction:column}
+.doctor-ai-card h2{line-height:1.35}
+.doctor-ai-flow{display:grid;gap:6px;margin-top:16px}
+.doctor-ai-flow span{padding:8px 9px;border:1px solid #e6eeee;border-radius:7px;background:#f8fbfb;color:#53666a;font-size:8px;font-weight:600}
+.doctor-ai-flow b{color:var(--onko-teal);font-size:10px}
+.doctor-ai-card>p{margin:14px 0 0;color:var(--onko-muted);font-size:8px;line-height:1.5}
+@media(max-width:1000px){.doctor-metric-grid{grid-template-columns:1fr 1fr}.doctor-content-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.doctor-shell{grid-template-columns:76px minmax(0,1fr)}.doctor-sidebar{padding:16px 8px}.doctor-brand{justify-content:center;padding-inline:0}.doctor-brand>div:last-child,.doctor-section-label,.doctor-sidebar-link span:not(.doctor-sidebar-icon),.doctor-security{display:none}.doctor-sidebar-link{justify-content:center;padding-inline:0}.doctor-topbar{padding-inline:18px}.doctor-page{padding-inline:18px}}
+@media(max-width:560px){.doctor-shell{display:block}.doctor-sidebar{position:static;width:100%;height:auto;border-right:0;border-bottom:1px solid var(--onko-line)}.doctor-brand{justify-content:flex-start}.doctor-brand>div:last-child,.doctor-section-label{display:block}.doctor-sidebar-nav{display:flex;overflow-x:auto}.doctor-sidebar-link{flex:0 0 auto}.doctor-sidebar-link span:not(.doctor-sidebar-icon){display:inline}.doctor-topbar{align-items:flex-start;flex-direction:column}.doctor-header-actions{width:100%;justify-content:flex-end}.doctor-metric-grid{grid-template-columns:1fr 1fr}}
