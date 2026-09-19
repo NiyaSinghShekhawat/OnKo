@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/client";
+import { getOnKoRole } from "@/lib/firebase/clientAuth";
 import DoctorSidebar from "@/doctor-dashboard/components/DoctorSidebar";
 import DoctorHeader from "@/doctor-dashboard/components/DoctorHeader";
 import DoctorOverviewFoundation from "@/doctor-dashboard/components/DoctorOverviewFoundation";
@@ -15,13 +16,33 @@ export default function DoctorPage() {
   const [patientId, setPatientId] = useState<string | null>(null);
 
   useEffect(() => {
-    return auth.onAuthStateChanged((user) => {
+    let active = true;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        router.replace("/login?role=doctor&next=/doctor");
+        if (active) router.replace("/login?role=doctor&next=/doctor");
         return;
       }
-      setCheckingAuth(false);
+      try {
+        const role = await getOnKoRole(user);
+        if (!active) return;
+        if (role !== "doctor") {
+          await auth.signOut();
+          router.replace("/login?role=doctor&next=/doctor&error=wrong-role");
+          return;
+        }
+        setCheckingAuth(false);
+      } catch (error) {
+        console.error("Doctor role verification failed", error);
+        if (active) {
+          await auth.signOut();
+          router.replace("/login?role=doctor&next=/doctor&error=session");
+        }
+      }
     });
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [router]);
 
   if (checkingAuth) {
