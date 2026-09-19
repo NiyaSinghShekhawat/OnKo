@@ -1,2 +1,3 @@
-import type { EngagementSignal } from "@/types/engagementSignal";import {authenticatedFetch} from "./authenticatedFetch";
-export async function fetchDoctorSignals():Promise<EngagementSignal[]>{const r=await authenticatedFetch("/api/doctor/signals");if(!r.ok)throw new Error("Unable to load signals.");return(await r.json()).data as EngagementSignal[]}
+import type {EngagementSignal} from "@/types/engagementSignal";import {authenticatedFetch} from "./authenticatedFetch";
+export async function fetchDoctorSignals():Promise<EngagementSignal[]>{const r=await authenticatedFetch("/api/doctor/signals");if(!r.ok)throw new Error("Unable to load signals.");return(await r.json()).data}
+export async function reviewDoctorSignal(input:{signalId:string;status:"reviewed"|"dismissed";note?:string}):Promise<EngagementSignal>{const r=await authenticatedFetch("/api/doctor/signals",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to review signal.");return(await r.json()).data}
