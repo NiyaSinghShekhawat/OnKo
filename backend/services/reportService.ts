@@ -1,12 +1,12 @@
 import type { Report } from "@/types/report";
-import { getDocument, listDocumentsByField, setDocument } from "../firebase/firestore";
+import { getDocument, listDocuments, listDocumentsByField, setDocument } from "../firebase/firestore";
 
 export function listReportsForPatient(patientId: string) {
   return listDocumentsByField<Report>("reports", "patientId", patientId);
 }
 
 export function listReports() {
-  return listDocumentsByField<Report>("reports", "patientId", "");
+  return listDocuments<Report>("reports");
 }
 
 export async function getDoctorReport(reportId: string, doctorId: string) {
