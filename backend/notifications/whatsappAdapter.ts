@@ -1,3 +1,35 @@
-import type {Notification} from "@/types/notification";import type {WhatsAppConsent} from "@/types/whatsappConsent";
-export interface WhatsAppDeliveryResult{status:"queued"|"sent"|"not-configured"|"not-consented"|"failed";channel:"whatsapp";notificationId:string;reason?:string}
-export async function sendWhatsAppNotification(notification:Notification,consent?:WhatsAppConsent|null):Promise<WhatsAppDeliveryResult>{if(!consent||consent.status!=="opted-in")return {status:"not-consented",channel:"whatsapp",notificationId:notification.notificationId,reason:"Patient has not opted in to WhatsApp notifications."};const token=process.env.WHATSAPP_ACCESS_TOKEN;const phoneNumberId=process.env.WHATSAPP_PHONE_NUMBER_ID;const recipient=notification.metadata?.whatsappRecipient;const template=notification.metadata?.whatsappTemplate;if(!token||!phoneNumberId)return {status:"not-configured",channel:"whatsapp",notificationId:notification.notificationId,reason:"WhatsApp Business credentials are not configured."};if(!recipient||!template)return {status:"not-configured",channel:"whatsapp",notificationId:notification.notificationId,reason:"An approved WhatsApp recipient and template are required."};try{const version=process.env.WHATSAPP_GRAPH_VERSION||"v23.0";const response=await fetch("https://graph.facebook.com/"+version+"/"+encodeURIComponent(phoneNumberId)+"/messages",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({messaging_product:"whatsapp",to:recipient,type:"template",template:{name:template,language:{code:process.env.WHATSAPP_TEMPLATE_LANGUAGE||"en_US"}}})});if(!response.ok){const body=await response.text();console.error("WhatsApp Business delivery failed.",response.status,body);return {status:"failed",channel:"whatsapp",notificationId:notification.notificationId,reason:"WhatsApp Business request failed."}}return {status:"sent",channel:"whatsapp",notificationId:notification.notificationId}}catch(e){console.error("WhatsApp Business transport error.",e);return {status:"failed",channel:"whatsapp",notificationId:notification.notificationId,reason:"WhatsApp Business transport error."}}}
+import type { Notification } from "@/types/notification";
+import type { WhatsAppConsent } from "@/types/whatsappConsent";
+
+export interface WhatsAppDeliveryResult {
+  status: "queued" | "not-configured" | "not-consented";
+  channel: "whatsapp";
+  notificationId: string;
+  reason?: string;
+}
+
+/**
+ * WhatsApp transport is intentionally disabled until OnKo is configured
+ * with an approved WhatsApp Business sender, credentials and templates.
+ * No external WhatsApp API request is made by this adapter.
+ */
+export async function sendWhatsAppNotification(
+  notification: Notification,
+  consent?: WhatsAppConsent | null,
+): Promise<WhatsAppDeliveryResult> {
+  if (!consent || consent.status !== "opted-in") {
+    return {
+      status: "not-consented",
+      channel: "whatsapp",
+      notificationId: notification.notificationId,
+      reason: "Patient has not opted in to WhatsApp notifications.",
+    };
+  }
+
+  return {
+    status: "not-configured",
+    channel: "whatsapp",
+    notificationId: notification.notificationId,
+    reason: "WhatsApp Business transport is not configured yet. The notification remains available through in-app delivery.",
+  };
+}
