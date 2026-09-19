@@ -1,0 +1,1 @@
+export interface AIInsight { aiInsightId:string; patientId:string; doctorId:string; feature:"patient-insights"; historySummary:string; appointmentSummary:string; careJourneySummary:string; engagementSummary:string; signals:string[]; limitations:string[]; model:string; generatedAt:string; reviewStatus:"pending-review"|"reviewed"; }

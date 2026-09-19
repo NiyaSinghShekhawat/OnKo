@@ -1,0 +1,2 @@
+import type {AIInsight} from "@/types/aiInsight";import {authenticatedFetch} from "./authenticatedFetch";
+export async function generateDoctorPatientInsights(patientId:string):Promise<AIInsight>{const r=await authenticatedFetch("/api/doctor/ai/patient-insights",{method:"POST",body:JSON.stringify({patientId})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.error||"Unable to generate AI patient insights.");}return(await r.json()).data as AIInsight}

@@ -1,0 +1,3 @@
+import type {DoctorPatient360} from "@/lib/api/doctorPatient";
+export interface PatientInsightOutput { historySummary:string; appointmentSummary:string; careJourneySummary:string; engagementSummary:string; signals:string[]; limitations:string[]; }
+export type PatientInsightContext=Pick<DoctorPatient360,"patient"|"appointments"|"medicines"|"procedures"|"reports"|"queries"|"careJourneys"|"milestones">;
