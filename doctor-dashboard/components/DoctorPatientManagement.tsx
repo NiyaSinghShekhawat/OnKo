@@ -98,7 +98,7 @@ export default function DoctorPatientManagement({ onOpenPatient }: { onOpenPatie
           />
           <select aria-label="Filter by care phase" value={phase} onChange={(event) => setPhase(event.target.value as "all" | CareJourneyState)}>
             <option value="all">All care phases</option>
-            {phaseOptions.slice(1).map((value) => <option key={value} value={value}>{phaseLabels[value]}</option>)}
+            {phaseOptions.slice(1).map((value) => <option key={value} value={value}>{phaseLabels[value as CareJourneyState]}</option>)}
           </select>
         </div>
 
