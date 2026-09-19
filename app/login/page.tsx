@@ -60,7 +60,8 @@ export default function LoginPage() {
         throw new Error("This account belongs to a different OnKo portal. Choose the correct workspace.");
       }
 
-      router.replace(next);
+      const destination = role === "doctor" ? "/doctor" : "/patient";
+      router.replace(destination);
     } catch (err) {
       console.error("OnKo login failed", err);
       setError(err instanceof Error && err.message.startsWith("This account") ? err.message : "Unable to sign in. Provision the demo accounts in Firebase Authentication first.");
