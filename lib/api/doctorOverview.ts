@@ -1,0 +1,3 @@
+import { authenticatedFetch } from "./authenticatedFetch";
+export interface DoctorOverview {totalPatients:number;activePatients:number;todayAppointments:number;pendingQueries:number;reportsForReview:number;upcomingFollowUps:number;recentActivity:Array<{date:string;title:string;detail:string}>}
+export async function fetchDoctorOverview():Promise<DoctorOverview>{const r=await authenticatedFetch("/api/doctor/overview");if(!r.ok)throw new Error("Unable to load doctor overview.");return(await r.json()).data as DoctorOverview}

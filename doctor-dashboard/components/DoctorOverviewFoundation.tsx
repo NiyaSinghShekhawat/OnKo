@@ -1,83 +1,11 @@
-const overviewCards = [
-  { label: "Total patients", value: "—", detail: "Connected patient cohort" },
-  { label: "Today appointments", value: "—", detail: "Scheduled care activities" },
-  { label: "Pending queries", value: "—", detail: "Patient conversations needing review" },
-  { label: "Human review", value: "—", detail: "Signals awaiting clinician review" },
-];
-
-const queueItems = [
-  ["Patient directory", "Search and open longitudinal patient records."],
-  ["Today's appointments", "Review scheduled encounters and follow-up context."],
-  ["Patient queries", "See conversations that require a care-team response."],
-  ["Review queue", "Review AI summaries and non-clinical engagement signals before action."],
-];
-
-export default function DoctorOverviewFoundation() {
-  return (
-    <section className="doctor-page">
-      <div className="doctor-welcome-card">
-        <div>
-          <span className="doctor-eyebrow">Care-team overview</span>
-          <h2>One workspace for the longitudinal care journey.</h2>
-          <p>
-            This foundation will connect the doctor experience to the same
-            patient data already powering the Patient Dashboard.
-          </p>
-        </div>
-        <div className="doctor-flow-badge">Shared patient data</div>
-      </div>
-
-      <div className="doctor-metric-grid">
-        {overviewCards.map((card) => (
-          <article className="doctor-card doctor-metric-card" key={card.label}>
-            <span>{card.label}</span>
-            <strong>{card.value}</strong>
-            <small>{card.detail}</small>
-          </article>
-        ))}
-      </div>
-
-      <div className="doctor-content-grid">
-        <article className="doctor-card">
-          <div className="doctor-card-heading">
-            <div>
-              <span className="doctor-eyebrow">Attention workspace</span>
-              <h2>Review areas</h2>
-            </div>
-            <span className="doctor-neutral-pill">Foundation</span>
-          </div>
-
-          <div className="doctor-review-list">
-            {queueItems.map(([title, description], index) => (
-              <div className="doctor-review-item" key={title}>
-                <div className="doctor-review-number">{index + 1}</div>
-                <div>
-                  <strong>{title}</strong>
-                  <p>{description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="doctor-card doctor-ai-card">
-          <span className="doctor-eyebrow">AI workflow</span>
-          <h2>AI supports review, not clinical decisions.</h2>
-          <div className="doctor-ai-flow">
-            <span>Patient data</span>
-            <b>→</b>
-            <span>Neural AI</span>
-            <b>→</b>
-            <span>Evidence / signal</span>
-            <b>→</b>
-            <span>Doctor review</span>
-          </div>
-          <p>
-            The next doctor phases will attach real Firestore-backed data and
-            review workflows to this shell.
-          </p>
-        </article>
-      </div>
-    </section>
-  );
+"use client";
+import {useEffect,useState} from "react";
+import {auth} from "@/lib/firebase/client";
+import {fetchDoctorOverview, type DoctorOverview} from "@/lib/api/doctorOverview";
+export default function DoctorOverviewFoundation(){
+ const [data,setData]=useState<DoctorOverview|null>(null);const [error,setError]=useState<string|null>(null);
+ useEffect(()=>{let active=true;const u=auth.onIdTokenChanged(async user=>{if(!user){setError("Sign in with a doctor account to view the command center.");return}try{const d=await fetchDoctorOverview();if(active)setData(d)}catch(e){console.error(e);if(active)setError("Unable to load command center data.")}});return()=>{active=false;u()}},[]);
+ if(error)return <section className="doctor-page"><div className="doctor-card doctor-directory-state doctor-directory-error">{error}</div></section>;
+ const cards=data?[["Total patients",data.totalPatients,"Assigned patient cohort"],["Active patients",data.activePatients,"Patients not marked deceased"],["Today appointments",data.todayAppointments,"Scheduled for today"],["Pending queries",data.pendingQueries,"Open patient conversations"],["Reports to review",data.reportsForReview,"Uploaded reports awaiting review"],["Upcoming follow-ups",data.upcomingFollowUps,"Scheduled appointments from today"]]:[];
+ return <section className="doctor-page"><div className="doctor-welcome-card"><div><span className="doctor-eyebrow">Care-team command center</span><h2>Longitudinal care operations at a glance.</h2><p>Live counts are scoped to patients assigned to your authenticated doctor account.</p></div><div className="doctor-flow-badge">Shared patient data</div></div><div className="doctor-metric-grid">{cards.map(([label,value,detail])=><article className="doctor-card doctor-metric-card" key={String(label)}><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>)}</div><div className="doctor-content-grid"><article className="doctor-card"><div className="doctor-card-heading"><div><span className="doctor-eyebrow">Attention workspace</span><h2>Recent patient activity</h2></div><span className="doctor-neutral-pill">Live data</span></div>{data?.recentActivity.length?data.recentActivity.map((x,i)=><div className="doctor-review-item" key={x.title+x.date+i}><div className="doctor-review-number">{i+1}</div><div><strong>{x.title}</strong><p>{x.detail} · {new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short"}).format(new Date(x.date))}</p></div></div>):<p className="doctor-muted-text">No recent activity is available.</p>}</article><article className="doctor-card doctor-ai-card"><span className="doctor-eyebrow">AI workflow</span><h2>AI supports review, not clinical decisions.</h2><div className="doctor-ai-flow"><span>Patient data</span><b>→</b><span>Neural AI</span><b>→</b><span>Evidence / signal</span><b>→</b><span>Doctor review</span></div><p>Clinical decisions remain with the care team. This command center only surfaces operational data and review queues.</p></article></div></section>;
 }
