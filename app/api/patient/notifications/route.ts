@@ -1,1 +1,4 @@
-import {NextRequest,NextResponse} from "next/server";import {getPatientNotifications} from "@/backend/api/notifications";export async function GET(req:NextRequest){try{return NextResponse.json({notifications:await getPatientNotifications(req)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to load notifications."},{status:500})}}
+import {NextRequest,NextResponse} from "next/server";
+import {getPatientNotifications,markPatientNotificationReadApi} from "@/backend/api/notifications";
+export async function GET(req:NextRequest){try{return NextResponse.json({notifications:await getPatientNotifications(req)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to load notifications."},{status:500})}}
+export async function PATCH(req:NextRequest){try{const body=await req.json();if(!body.notificationId)return NextResponse.json({error:"notificationId is required."},{status:400});return NextResponse.json({notification:await markPatientNotificationReadApi(req,body.notificationId)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to mark notification as read."},{status:500})}}
