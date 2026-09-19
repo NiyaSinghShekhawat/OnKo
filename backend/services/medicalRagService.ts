@@ -1,0 +1,1 @@
+import {retrieveMedicalLiterature} from "@/backend/rag";import {answerMedicalReference} from "@/backend/ai/medicalReferenceProvider";export async function askMedicalReference(question:string){const retrieval=await retrieveMedicalLiterature(question,5);return answerMedicalReference(question,retrieval)}
