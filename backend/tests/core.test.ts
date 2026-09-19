@@ -1,15 +1,39 @@
-import {strict as assert} from "node:assert";
-import {patientIdFromToken,doctorIdFromToken} from "@/backend/firebase/auth";
-import {createPatientNotification} from "@/backend/services/notificationService";
-import {sendWhatsAppNotification} from "@/backend/notifications/whatsappAdapter";
-const patientToken:any={role:"patient",patientId:"P1"};
-const doctorToken:any={role:"doctor",doctorId:"D1"};
-assert.equal(patientIdFromToken(patientToken),"P1");
-assert.throws(()=>patientIdFromToken({...patientToken,patientId:""}));
-assert.equal(doctorIdFromToken(doctorToken),"D1");
-assert.throws(()=>doctorIdFromToken({...doctorToken,role:"patient"}));
-const n=await createPatientNotification({patientId:"P1",type:"doctor-update",title:"Test",message:"Synthetic test"});
-assert.equal(n.channel,"in-app");assert.equal(n.status,"sent");
-const wa=await sendWhatsAppNotification(n,{consentId:"c",patientId:"P1",status:"opted-out",source:"patient",version:"1.0"});
-assert.equal(wa.status,"not-consented");
-console.log("Core OnKo security/notification checks passed.");
+import { strict as assert } from "node:assert";
+import { patientIdFromToken, doctorIdFromToken } from "@/backend/firebase/auth";
+import { createPatientNotification } from "@/backend/services/notificationService";
+import { sendWhatsAppNotification } from "@/backend/notifications/whatsappAdapter";
+
+async function main() {
+  const patientToken: any = { role: "patient", patientId: "P1" };
+  const doctorToken: any = { role: "doctor", doctorId: "D1" };
+
+  assert.equal(patientIdFromToken(patientToken), "P1");
+  assert.throws(() => patientIdFromToken({ ...patientToken, patientId: "" }));
+  assert.equal(doctorIdFromToken(doctorToken), "D1");
+  assert.throws(() => doctorIdFromToken({ ...doctorToken, role: "patient" }));
+
+  const n = await createPatientNotification({
+    patientId: "P1",
+    type: "doctor-update",
+    title: "Test",
+    message: "Synthetic test",
+  });
+  assert.equal(n.channel, "in-app");
+  assert.equal(n.status, "sent");
+
+  const wa = await sendWhatsAppNotification(n, {
+    consentId: "c",
+    patientId: "P1",
+    status: "opted-out",
+    source: "patient",
+    version: "1.0",
+  });
+  assert.equal(wa.status, "not-consented");
+
+  console.log("Core OnKo security/notification checks passed.");
+}
+
+void main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
