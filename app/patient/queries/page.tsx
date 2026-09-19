@@ -25,7 +25,7 @@ export default function QueriesPage() {
     <section className="patient-card"><span className="patient-eyebrow">ASK CARE TEAM</span><h1 className="onko-page-title">Questions for your care team</h1><p className="onko-page-subtitle">Send a question to your care team and keep the conversation with your care record.</p></section>
     <section className="query-layout">
       <div className="patient-card query-list"><div className="patient-card-heading"><div><span className="patient-eyebrow">CONVERSATIONS</span><h2 className="journey-section-title">My queries</h2></div><span className="patient-time">{queries.length} total</span></div>
-        {error?<p className="patient-muted">{error}</p>:queries.length?queries.map(q=><div className="query-list-item" key={q.queryId}><span className="query-list-status">{q.status.toUpperCase()}</span><strong>{q.subject}</strong><span>Last updated · {q.updatedAt}</span></div>):<p className="patient-muted">{loading?"Loading questions…":"No questions have been recorded yet."}</p>}
+        {error?<p className="patient-muted">{error}</p>:queries.length?queries.map(q=><button type="button" className="query-list-item" key={q.queryId} onClick={()=>setSelectedQueryId(q.queryId)} aria-pressed={q.queryId===activeQuery?.queryId}><span className="query-list-status">{q.status.toUpperCase()}</span><strong>{q.subject}</strong><span>Last updated · {q.updatedAt}</span></button>):<p className="patient-muted">{loading?"Loading questions…":"No questions have been recorded yet."}</p>}
       </div>
       <div className="patient-card query-thread">
         <div className="query-thread-header"><div><span className="patient-eyebrow">NEW QUESTION</span><h2>Ask your care team</h2></div></div>
