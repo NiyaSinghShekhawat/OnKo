@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --onko-ink: #17353a;
+  --onko-muted: #6f7f83;
+  --onko-line: #dfe7e8;
+  --onko-bg: #f6f9f9;
+  --onko-card: #ffffff;
+  --onko-teal: #0f4650;
+  --onko-teal-soft: #e9f4f4;
+  --onko-red: #b4232f;
+  --onko-red-soft: #fff0f1;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  background: var(--onko-bg);
+  color: var(--onko-ink);
+  font-family: Inter, Arial, sans-serif;
+}
+
+button, input, textarea { font: inherit; }
+
+a { color: inherit; text-decoration: none; }
+
+.onko-patient-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+}
+
+.onko-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  background: #fff;
+  border-right: 1px solid var(--onko-line);
+}
+
+.onko-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 24px;
+}
+
+.onko-brand-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--onko-teal);
+  color: #fff;
+  font-weight: 700;
+}
+
+.onko-brand-name { font-weight: 700; letter-spacing: -.02em; }
+.onko-brand-subtitle { color: var(--onko-muted); font-size: 10px; margin-top: 2px; }
+
+.onko-section-label {
+  padding: 8px 10px;
+  color: var(--onko-muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.onko-sidebar-nav { display: grid; gap: 4px; }
+
+.onko-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #516266;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.onko-sidebar-link:hover { background: #f1f6f6; color: var(--onko-ink); }
+.onko-sidebar-link.active { background: var(--onko-teal); color: #fff; }
+
+.onko-sidebar-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.onko-security {
+  margin-top: auto;
+  padding: 10px;
+  border: 1px solid var(--onko-line);
+  border-radius: 9px;
+  color: var(--onko-muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.onko-main { min-width: 0; }
+
+.onko-topbar {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--onko-line);
+}
+
+.onko-breadcrumb { color: var(--onko-muted); font-size: 11px; }
+.onko-breadcrumb strong { color: var(--onko-ink); }
+
+.onko-patient-meta { display: flex; align-items: center; gap: 12px; }
+.onko-status { color: #2f6e57; font-size: 10px; font-weight: 600; }
+.onko-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e4eeee;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.onko-page { padding: 24px 28px 36px; max-width: 1440px; margin: 0 auto; }
+.onko-page-title { margin: 0; font-size: 24px; letter-spacing: -.04em; }
+.onko-page-subtitle { margin: 7px 0 0; color: var(--onko-muted); font-size: 12px; }
+
+.onko-placeholder {
+  margin-top: 24px;
+  padding: 28px;
+  background: var(--onko-card);
+  border: 1px solid var(--onko-line);
+  border-radius: 12px;
+}
+
+.onko-placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.onko-placeholder-card {
+  min-height: 110px;
+  padding: 16px;
+  border: 1px solid var(--onko-line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .onko-patient-shell { grid-template-columns: 76px minmax(0, 1fr); }
+  .onko-sidebar { padding: 16px 8px; }
+  .onko-brand { justify-content: center; padding-inline: 0; }
+  .onko-brand-copy, .onko-section-label, .onko-sidebar-link span:not(.onko-sidebar-icon), .onko-security { display: none; }
+  .onko-sidebar-link { justify-content: center; padding-inline: 0; }
+  .onko-topbar { padding-inline: 18px; }
+  .onko-page { padding-inline: 18px; }
+}
+
+@media (max-width: 620px) {
+  .onko-patient-shell { display: block; }
+  .onko-sidebar { position: static; width: 100%; height: auto; border-right: 0; border-bottom: 1px solid var(--onko-line); }
+  .onko-sidebar-nav { display: flex; overflow-x: auto; }
+  .onko-sidebar-link { flex: 0 0 auto; }
+  .onko-brand { justify-content: flex-start; }
+  .onko-brand-copy, .onko-section-label { display: block; }
+  .onko-sidebar-link span:not(.onko-sidebar-icon) { display: inline; }
+  .onko-placeholder-grid { grid-template-columns: 1fr; }
+}
