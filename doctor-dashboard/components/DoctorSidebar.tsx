@@ -2,6 +2,7 @@ import type { DoctorNavEntry } from "../types/doctor";
 
 const navItems: DoctorNavEntry[] = [
   { id: "overview", label: "Overview", icon: "⌂" },
+  { id: "ai", label: "AI Command Center", icon: "✦" },
   { id: "patients", label: "Patient Management", icon: "♙" },
   { id: "queries", label: "Queries / Triage", icon: "?" },
   { id: "reports", label: "Reports", icon: "▤" },
