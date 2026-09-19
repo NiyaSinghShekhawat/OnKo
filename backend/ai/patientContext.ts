@@ -8,7 +8,7 @@ import { listCareJourneysForPatient } from "@/backend/services/careJourneyServic
 import { listMilestonesForPatient } from "@/backend/services/milestoneService";
 
 export interface PatientContext {
-  patient: Awaited<ReturnType<typeof getPatient>>;
+  patient: NonNullable<Awaited<ReturnType<typeof getPatient>>>;
   appointments: Awaited<ReturnType<typeof listAppointmentsForPatient>>;
   medicines: Awaited<ReturnType<typeof listMedicinesForPatient>>;
   procedures: Awaited<ReturnType<typeof listProceduresForPatient>>;
