@@ -1,0 +1,1 @@
+import {NextRequest,NextResponse} from "next/server";import {requirePatient} from "@/backend/api/auth";import {listPatientAIConversations} from "@/backend/services/patientAIConversationService";export async function GET(r:NextRequest){const a=await requirePatient(r);if("error"in a)return a.error;return NextResponse.json({data:await listPatientAIConversations(a.patientId)});}
