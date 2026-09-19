@@ -1,1 +1,3 @@
-"use client";import WhatsAppConsent from "@/patient-dashboard/components/WhatsAppConsent";export default function PatientNotificationSettings(){return <main className="patient-page"><div className="patient-page-heading"><span className="patient-eyebrow">NOTIFICATION SETTINGS</span><h1>Communication preferences</h1><p>Manage how OnKo can send approved reminders and updates.</p></div><WhatsAppConsent/></main>
+"use client";
+import WhatsAppConsent from "@/patient-dashboard/components/WhatsAppConsent";
+export default function PatientNotificationSettings(){return <main className="patient-page"><div className="patient-page-heading"><span className="patient-eyebrow">NOTIFICATION SETTINGS</span><h1>Communication preferences</h1><p>Manage how OnKo can send approved reminders and updates.</p></div><WhatsAppConsent/></main>}
