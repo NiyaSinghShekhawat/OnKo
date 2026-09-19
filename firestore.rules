@@ -1,33 +1,28 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function signedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(patientId) {
-      return signedIn() && request.auth.uid == patientId;
-    }
-
-    function isDoctor() {
-      return signedIn() &&
-        request.auth.token.role == "doctor";
-    }
-
-    function isAdmin() {
-      return signedIn() &&
-        request.auth.token.role == "admin";
-    }
-
-    match /patients/{patientId} {
-      allow read: if isOwner(patientId) || isDoctor() || isAdmin();
-      allow write: if isDoctor() || isAdmin();
-    }
-
-    match /{collection}/{documentId} {
-      allow read, write: if isDoctor() || isAdmin();
-    }
+    function signedIn(){return request.auth != null;}
+    function isAdmin(){return signedIn() && request.auth.token.role == "admin";}
+    function isPatient(patientId){return signedIn() && request.auth.token.role == "patient" && request.auth.token.patientId == patientId;}
+    function isAssignedDoctor(patientId){return signedIn() && request.auth.token.role == "doctor" && exists(/databases/$(database)/documents/patients/$(patientId)) && get(/databases/$(database)/documents/patients/$(patientId)).data.doctorId == request.auth.token.doctorId;}
+    function canReadPatientResource(patientId){return isAdmin() || isPatient(patientId) || isAssignedDoctor(patientId);}
+    match /patients/{patientId}{allow read: if isAdmin() || isPatient(patientId) || isAssignedDoctor(patientId);allow create,update,delete: if false;}
+    match /appointments/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /medicines/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /procedures/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /reports/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /queries/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /milestones/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /careJourneys/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /caregivers/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
+    match /notifications/{id}{allow read: if isAdmin() || isPatient(resource.data.patientId);allow create,update,delete: if false;}
+    match /engagementSignals/{id}{allow read: if isAdmin() || isAssignedDoctor(resource.data.patientId);allow create,update,delete: if false;}
+    match /aiInsights/{id}{allow read: if isAdmin() || isAssignedDoctor(resource.data.patientId);allow create,update,delete: if false;}
+    match /patientAIConversations/{id}{allow read: if isAdmin() || isPatient(resource.data.patientId);allow create,update,delete: if false;}
+    match /patientAIMessages/{id}{allow read: if isAdmin() || isPatient(resource.data.patientId);allow create,update,delete: if false;}
+    match /doctorActionTasks/{id}{allow read: if isAdmin() || (signedIn() && request.auth.token.role == "doctor" && resource.data.doctorId == request.auth.token.doctorId);allow create,update,delete: if false;}
+    match /auditLogs/{id}{allow read,write: if false;}
+    match /doctors/{doctorId}{allow read: if isAdmin() || (signedIn() && request.auth.token.role == "doctor" && request.auth.token.doctorId == doctorId);allow create,update,delete: if false;}
+    match /{document=**}{allow read,write: if false;}
   }
 }
