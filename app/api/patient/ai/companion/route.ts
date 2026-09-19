@@ -1,0 +1,4 @@
+import {NextRequest,NextResponse} from "next/server";
+import {requirePatient} from "@/backend/api/auth";
+import {answerPatientCompanion} from "@/backend/services/patientCompanionService";
+export async function POST(request:NextRequest){const auth=await requirePatient(request);if("error"in auth)return auth.error;try{const body=await request.json();if(typeof body.question!=="string"||!body.question.trim())return NextResponse.json({error:"question is required."},{status:400});if(body.question.trim().length>2000)return NextResponse.json({error:"Question is too long."},{status:400});return NextResponse.json({data:await answerPatientCompanion(auth.patientId,body.question)});}catch(e){console.error(e);return NextResponse.json({error:"Unable to answer with the patient companion right now."},{status:400});}}
