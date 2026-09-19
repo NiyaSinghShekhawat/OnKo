@@ -2,7 +2,7 @@
 import { PatientShell } from "@/patient-dashboard/components/PatientShell";
 import { usePatientContext } from "@/app/patient/data-provider";
 import { createQuery } from "@/lib/api/queries";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function QueriesPage() {
   const { patient, queries, loading, error } = usePatientContext();
@@ -10,6 +10,7 @@ export default function QueriesPage() {
   const [draft,setDraft]=useState("");
   const [sending,setSending]=useState(false);
   const [sendError,setSendError]=useState<string|null>(null);
+  const [selectedQueryId,setSelectedQueryId]=useState<string|null>(null);
 
   async function sendMessage(){
     if(!patient||!subject.trim()||!draft.trim()||sending)return;
@@ -18,7 +19,8 @@ export default function QueriesPage() {
     catch(e){setSendError(e instanceof Error?e.message:"Unable to send question.");}
     finally{setSending(false);}
   }
-  const activeQuery=queries[0];
+  useEffect(()=>{if(!selectedQueryId&&queries.length)setSelectedQueryId(queries[0].queryId);},[queries,selectedQueryId]);
+  const activeQuery=queries.find(q=>q.queryId===selectedQueryId)??queries[0];
   return <PatientShell><main className="onko-page">
     <section className="patient-card"><span className="patient-eyebrow">ASK CARE TEAM</span><h1 className="onko-page-title">Questions for your care team</h1><p className="onko-page-subtitle">Send a question to your care team and keep the conversation with your care record.</p></section>
     <section className="query-layout">
