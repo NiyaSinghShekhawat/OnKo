@@ -1,0 +1,3 @@
+import type {WhatsAppConsent} from "@/types/whatsappConsent";import {documentRef} from "@/backend/firebase/firestore";
+export async function getWhatsAppConsent(patientId:string){const s=await documentRef<WhatsAppConsent>("patients",patientId).get();if(!s.exists)return null;const d=s.data() as {whatsappConsent?:WhatsAppConsent};return d.whatsappConsent||null}
+export async function setWhatsAppConsent(patientId:string,status:"opted-in"|"opted-out"){const now=new Date().toISOString();const consent:WhatsAppConsent={consentId:"wa-consent-"+patientId,status,patientId,source:"patient",version:"1.0",...(status==="opted-in"?{consentedAt:now}:{withdrawnAt:now})};await documentRef("patients",patientId).update({whatsappConsent:consent});return consent}
