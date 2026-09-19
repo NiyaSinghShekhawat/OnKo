@@ -1,0 +1,23 @@
+export function WelcomeCard() {
+  return (
+    <section className="patient-welcome-card">
+      <div>
+        <span className="patient-eyebrow">PATIENT COMPANION</span>
+        <h2>Welcome back, Ananya</h2>
+        <p>Your clinical care journey, today&apos;s schedule, and companion tasks.</p>
+        <div className="patient-meta-row">
+          <span className="patient-chip">HER2+ Breast Oncology</span>
+          <span>UHID: ONK-0821</span>
+          <span>Care journey active</span>
+        </div>
+      </div>
+      <div className="patient-doctor-summary">
+        <span className="patient-icon-badge">✦</span>
+        <div>
+          <strong>Supervising Oncologist</strong>
+          <span>Dr. S. Kulkarni</span>
+        </div>
+      </div>
+    </section>
+  );
+}
