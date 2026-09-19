@@ -1,0 +1,3 @@
+import type {Caregiver, CaregiverAccessStatus} from "@/types/caregiver";import {authenticatedFetch} from "./authenticatedFetch";
+export async function fetchPatientCaregivers():Promise<Caregiver[]>{const r=await authenticatedFetch("/api/patient/caregivers");if(!r.ok)throw new Error("Unable to load caregivers.");return(await r.json()).data}
+export async function updatePatientCaregiver(input:{caregiverId:string;accessStatus:Extract<CaregiverAccessStatus,"consented"|"revoked">}):Promise<Caregiver>{const r=await authenticatedFetch("/api/patient/caregivers",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to update caregiver consent.");return(await r.json()).data}
