@@ -4,6 +4,7 @@ import { getPatient } from "@/backend/services/patientService";
 import { getQuery } from "@/backend/services/queryService";
 import { setDocument } from "@/backend/firebase/firestore";
 import { notifyQueryUpdate } from "@/backend/services/notificationTriggers";
+import { createDocument } from "@/backend/firebase/firestore";
 import type { Query, QueryMessage } from "@/types/query";
 
 export async function POST(request: NextRequest) {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     const reply: QueryMessage = { messageId: crypto.randomUUID(), senderId: auth.doctorId, senderRole: "doctor", message, createdAt: now };
     const next: Query = { ...query, status: "answered", messages: [...query.messages, reply], updatedAt: now };
     await setDocument<Query>("queries", queryId, next);
-    await notifyQueryUpdate(query.patientId, queryId, query.subject);
+    await notifyQueryUpdate(query.patientId, queryId, query.subject);\n    await createDocument("auditLogs", { auditId: "query-replied-" + queryId + "-" + Date.now(), actorId: auth.doctorId, actorRole: "doctor", action: "query_replied", entityType: "query", entityId: queryId, patientId: query.patientId, createdAt: new Date().toISOString() });
     return NextResponse.json({ data: next });
   } catch (error) {
     console.error("POST /api/doctor/queries/reply failed", error);
