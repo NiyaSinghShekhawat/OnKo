@@ -1,5 +1,3 @@
-import type { Report } from "@/types/report";
-import { getDocument, listDocuments, listDocumentsByField } from "../firebase/firestore";
-export const getReport=(id:string)=>getDocument<Report>("reports",id);
-export const listReports=()=>listDocuments<Report>("reports");
-export const listReportsForPatient=(id:string)=>listDocumentsByField<Report>("reports","patientId",id);
+import type {Report} from "@/types/report";import {getDocument,listDocumentsByField,setDocument} from "../firebase/firestore";
+export async function getDoctorReport(reportId:string,doctorId:string){const r=await getDocument<Report>("reports",reportId);if(!r)return null;const p=await getDocument<{patientId:string;doctorId:string}>("patients",r.patientId);if(!p||p.doctorId!==doctorId)return null;return r}
+export async function reviewDoctorReport(reportId:string,doctorId:string,notes:string){const r=await getDoctorReport(reportId,doctorId);if(!r)throw new Error("Report not found.");const next={...r,status:"reviewed" as const,notes:notes.trim()||r.notes};await setDocument<Report>("reports",reportId,next);return next}

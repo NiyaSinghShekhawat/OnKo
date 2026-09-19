@@ -1,0 +1,2 @@
+import type {Report} from "@/types/report";import {authenticatedFetch} from "./authenticatedFetch";
+export async function reviewDoctorReport(input:{reportId:string;notes?:string}):Promise<Report>{const r=await authenticatedFetch("/api/doctor/reports",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to review report.");return(await r.json()).data as Report}
