@@ -1,0 +1,1 @@
+import {getPatientContext} from "@/backend/ai/patientContext";import {createAppointmentOverview} from "@/backend/ai/appointmentOverview";export async function getAppointmentOverview(patientId:string,doctorId:string,appointmentId:string){const ctx=await getPatientContext(patientId,doctorId);return createAppointmentOverview(ctx,appointmentId)}

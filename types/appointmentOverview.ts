@@ -1,0 +1,1 @@
+export interface AppointmentOverview{appointmentId:string;summary:string;agenda:string[];openItems:string[];recentChanges:string[];sourceSections:string[];model:string;disclaimer:string}
