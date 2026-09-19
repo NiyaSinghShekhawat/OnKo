@@ -1,18 +1,24 @@
-# Firebase identity provisioning
+# Firebase identity provisioning and demo data
 
+## Patient identity provisioning
 Patient APIs require Firebase ID-token custom claims:
+- role: "patient"
+- patientId: "<patients document id>"
 
-- `role: "patient"`
-- `patientId: "<patients document id>"`
+Run:
+`npm run provision:patient -- <firebase-uid> <patient-id>`
 
-The claims are intentionally server-managed. Do not let the browser choose a patient ID or role.
+After claims change, sign out/in or refresh the ID token.
 
-For a local/admin environment, run the provisioning utility with the Firebase Admin environment variables configured:
+## Synthetic demo data
+The repository includes a development-only synthetic dataset. It contains no real patient data and must not be used as production clinical data.
 
-```
-npm run provision:patient -- <firebase-uid> <patient-id>
-```
+Run:
+`npm run seed:demo`
 
-After claims are changed, the patient must obtain a fresh ID token (sign out/in, or refresh the token) before the new claims are visible.
+The seed creates a patient with document ID `ONK-DEMO-001`, doctor `DOC-DEMO-001`, appointments, medicines, procedures, reports metadata, care journey, milestones and a sample care-team query.
 
-This utility is an operational setup tool, not a public API endpoint.
+Then provision a Firebase test account to the demo patient:
+`npm run provision:patient -- <firebase-uid> ONK-DEMO-001`
+
+Do not put real patient identifiers, medical records, or credentials into this seed script.
