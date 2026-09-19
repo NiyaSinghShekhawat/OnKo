@@ -31,7 +31,7 @@ function formatDate(value?: string) {
   return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(date);
 }
 
-export default function DoctorPatientManagement() {
+export default function DoctorPatientManagement({ onOpenPatient }: { onOpenPatient: (patientId: string) => void }) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState("");
   const [phase, setPhase] = useState<"all" | CareJourneyState>("all");
@@ -129,7 +129,7 @@ export default function DoctorPatientManagement() {
                       </div>
                     </td>
                     <td>{formatDate(patient.lastUpdatedAt)}</td>
-                    <td><button className="doctor-open-patient" type="button">Open 360°</button></td>
+                    <td><button className="doctor-open-patient" type="button" onClick={() => onOpenPatient(patient.patientId)}>Open 360°</button></td>
                   </tr>
                 ))}
               </tbody>
