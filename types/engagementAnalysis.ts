@@ -1,0 +1,1 @@
+export interface EngagementAnalysis{summary:string;patterns:string[];sourceSignalIds:string[];disclaimer:string;model:string;generatedAt?:string;}
