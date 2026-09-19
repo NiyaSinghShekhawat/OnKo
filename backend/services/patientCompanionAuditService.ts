@@ -1,0 +1,2 @@
+import {createDocument} from "@/backend/firebase/firestore";import type {PatientCompanionAudit} from "@/types/patientCompanionAudit";
+export async function createPatientCompanionAudit(input:Omit<PatientCompanionAudit,"auditId"|"createdAt">){const data:PatientCompanionAudit={...input,auditId:crypto.randomUUID(),createdAt:new Date().toISOString()};await createDocument("auditLogs",data);return data;}
