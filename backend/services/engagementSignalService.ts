@@ -1,10 +1,3 @@
-import type { EngagementSignal } from "@/types/engagementSignal";import type { AuditLog } from "@/types/auditLog";
-import { getDocument,listDocumentsByField,createDocument,setDocument } from "../firebase/firestore";
-export async function getDoctorSignal(id:string){return getDocument<EngagementSignal>("engagementSignals",id)}
-export async function listDoctorSignals(doctorId:string){return listDocumentsByField<EngagementSignal>("engagementSignals","doctorId",doctorId)}
-export async function reviewDoctorSignal(doctorId:string,signalId:string,status:"reviewed"|"dismissed",note?:string){
- const signal=await getDoctorSignal(signalId);if(!signal||signal.doctorId!==doctorId)throw new Error("Signal not found.");
- const next={...signal,status};await setDocument<EngagementSignal>("engagementSignals",signalId,next);
- const audit:AuditLog={auditId:crypto.randomUUID(),actorId:doctorId,actorRole:"doctor",action:status==="reviewed"?"signal-reviewed":"signal-dismissed",entityType:"engagement-signal",entityId:signalId,patientId:signal.patientId,note:note?.trim()||undefined,createdAt:new Date().toISOString()};
- await createDocument<AuditLog>("auditLogs",audit);return next;
-}
+import type {EngagementSignal} from "@/types/engagementSignal";import {createDocument,listDocumentsByField} from "@/backend/firebase/firestore";import {detectEngagementSignals} from "@/backend/ai/engagementSignals";import {getPatientContext} from "@/backend/ai/patientContext";
+export async function detectAndStoreEngagementSignals(patientId:string,doctorId:string){const ctx=await getPatientContext(patientId,doctorId);const detected=detectEngagementSignals({patientId,doctorId,milestones:ctx.milestones,appointments:ctx.appointments,queries:ctx.queries});const existing=await listDocumentsByField<EngagementSignal>("engagementSignals","patientId",patientId);const existingIds=new Set(existing.map(s=>s.signalId));for(const signal of detected)if(!existingIds.has(signal.signalId))await createDocument("engagementSignals",signal);return detected.filter(s=>!existingIds.has(s.signalId))}
+export async function listPatientEngagementSignals(patientId:string){return listDocumentsByField<EngagementSignal>("engagementSignals","patientId",patientId)}

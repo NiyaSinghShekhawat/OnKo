@@ -1,0 +1,2 @@
+import {NextRequest} from "next/server";import {requireDoctor} from "@/backend/api/auth";import {detectAndStoreEngagementSignals,listPatientEngagementSignals} from "@/backend/services/engagementSignalService";
+export async function getDoctorEngagementSignals(req:NextRequest,patientId:string){const auth=await requireDoctor(req);await detectAndStoreEngagementSignals(patientId,auth.doctorId);return listPatientEngagementSignals(patientId)}

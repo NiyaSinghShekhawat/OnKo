@@ -1,3 +1,3 @@
-export type EngagementSignalType="missed-milestone"|"missed-follow-up"|"repeated-delay"|"open-query"|"engagement-change"|"patient-sos";
+export type EngagementSignalType="missed-milestone"|"overdue-milestone"|"unanswered-query"|"missed-follow-up"|"engagement-decline";
 export type EngagementSignalStatus="pending-review"|"reviewed"|"dismissed";
-export interface EngagementSignal{signalId:string;patientId:string;doctorId:string;type:EngagementSignalType;title:string;description:string;detectedAt:string;status:EngagementSignalStatus;source:string;}
+export interface EngagementSignal{signalId:string;patientId:string;doctorId:string;type:EngagementSignalType;status:EngagementSignalStatus;severity:"low"|"medium"|"high";title:string;description:string;evidence:string[];detectedAt:string;reviewedAt?:string;reviewedBy?:string;reviewNote?:string;}

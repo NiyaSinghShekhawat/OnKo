@@ -1,0 +1,2 @@
+import {NextRequest,NextResponse} from "next/server";import {getDoctorEngagementSignals} from "@/backend/api/engagementSignals";
+export async function GET(req:NextRequest){try{const patientId=new URL(req.url).searchParams.get("patientId");if(!patientId)return NextResponse.json({error:"patientId is required."},{status:400});return NextResponse.json({signals:await getDoctorEngagementSignals(req,patientId)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to load engagement signals."},{status:500})}}
