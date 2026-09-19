@@ -1,0 +1,30 @@
+export type FirestoreCollection =
+  | "patients"
+  | "doctors"
+  | "appointments"
+  | "medicines"
+  | "procedures"
+  | "reports"
+  | "queries"
+  | "milestones"
+  | "careJourneys"
+  | "caregivers"
+  | "notifications"
+  | "engagementSignals"
+  | "auditLogs";
+
+export const COLLECTIONS: Record<FirestoreCollection, FirestoreCollection> = {
+  patients: "patients",
+  doctors: "doctors",
+  appointments: "appointments",
+  medicines: "medicines",
+  procedures: "procedures",
+  reports: "reports",
+  queries: "queries",
+  milestones: "milestones",
+  careJourneys: "careJourneys",
+  caregivers: "caregivers",
+  notifications: "notifications",
+  engagementSignals: "engagementSignals",
+  auditLogs: "auditLogs",
+};
