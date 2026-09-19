@@ -1,0 +1,47 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireDoctor } from "@/backend/api/auth";
+import { getPatient } from "@/backend/services/patientService";
+import { createDocument, getDocument, listDocumentsByField, setDocument } from "@/backend/firebase/firestore";
+import type { Milestone } from "@/types/milestone";
+
+export async function POST(request: NextRequest) {
+  const auth = await requireDoctor(request);
+  if ("error" in auth) return auth.error;
+  try {
+    const body = await request.json();
+    const patientId = String(body.patientId ?? "");
+    const patient = await getPatient(patientId);
+    if (!patient || patient.doctorId !== auth.doctorId) return NextResponse.json({ error: "Patient not found." }, { status: 404 });
+    if (!body.title || !body.dueDate) return NextResponse.json({ error: "Title and due date are required." }, { status: 400 });
+    const milestoneId = crypto.randomUUID();
+    const milestone: Milestone = { milestoneId, patientId, title: String(body.title).trim(), description: body.description ? String(body.description).trim() : undefined, dueDate: String(body.dueDate), status: "pending" };
+    await createDocument<Milestone>("milestones", milestone);
+    return NextResponse.json({ data: milestone }, { status: 201 });
+  } catch (error) {
+    console.error("POST /api/doctor/milestones failed", error);
+    return NextResponse.json({ error: "Unable to create milestone." }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const auth = await requireDoctor(request);
+  if ("error" in auth) return auth.error;
+  try {
+    const body = await request.json();
+    const milestoneId = String(body.milestoneId ?? "");
+    const existing = await getDocument<Milestone>("milestones", milestoneId);
+    if (!existing) return NextResponse.json({ error: "Milestone not found." }, { status: 404 });
+    const patient = await getPatient(existing.patientId);
+    if (!patient || patient.doctorId !== auth.doctorId) return NextResponse.json({ error: "Milestone not found." }, { status: 404 });
+    const allowed = ["pending","completed","overdue","cancelled"];
+    if (body.status && !allowed.includes(body.status)) return NextResponse.json({ error: "Invalid milestone status." }, { status: 400 });
+    const next = { ...existing, ...(body.title !== undefined ? { title: String(body.title).trim() } : {}), ...(body.description !== undefined ? { description: body.description ? String(body.description).trim() : undefined } : {}), ...(body.dueDate !== undefined ? { dueDate: String(body.dueDate) } : {}), ...(body.status !== undefined ? { status: body.status } : {}) } as Milestone;
+    if (next.status === "completed" && !next.completedAt) next.completedAt = new Date().toISOString();
+    if (next.status !== "completed") delete next.completedAt;
+    await setDocument<Milestone>("milestones", milestoneId, next);
+    return NextResponse.json({ data: next });
+  } catch (error) {
+    console.error("PATCH /api/doctor/milestones failed", error);
+    return NextResponse.json({ error: "Unable to update milestone." }, { status: 500 });
+  }
+}

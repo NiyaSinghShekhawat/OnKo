@@ -1,0 +1,4 @@
+import type { Milestone } from "@/types/milestone";
+import { authenticatedFetch } from "./authenticatedFetch";
+export async function createDoctorMilestone(input:{patientId:string;title:string;description?:string;dueDate:string}):Promise<Milestone>{const r=await authenticatedFetch("/api/doctor/milestones",{method:"POST",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to create milestone.");return(await r.json()).data as Milestone}
+export async function updateDoctorMilestone(input:{milestoneId:string;status?:Milestone["status"];title?:string;description?:string;dueDate?:string}):Promise<Milestone>{const r=await authenticatedFetch("/api/doctor/milestones",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to update milestone.");return(await r.json()).data as Milestone}
