@@ -1,0 +1,5 @@
+import type { MedicalChunk } from "@/types/rag";
+const STOP=new Set(["the","and","for","with","from","that","this","what","does","about","into","have","has","are","was","were","how","why","when","where"]);
+function tokens(s:string){return s.toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/).filter(x=>x.length>2&&!STOP.has(x))}
+function score(question:string,chunk:MedicalChunk){const q=new Set(tokens(question));const text=tokens([chunk.title,chunk.text,chunk.abstract].filter(Boolean).join(" "));let overlap=0;for(const t of text)if(q.has(t))overlap++;const titleBoost=tokens(question).filter(t=>(chunk.title||"").toLowerCase().includes(t)).length*3;const openAccessBoost=chunk.section==="open-access-full-text"?2:0;return overlap+titleBoost+openAccessBoost}
+export function rankMedicalEvidence(question:string,chunks:MedicalChunk[],limit=12){return chunks.map((chunk,index)=>({...chunk,evidenceScore:score(question,chunk),originalRank:index})).sort((a,b)=>b.evidenceScore-a.evidenceScore||a.originalRank-b.originalRank).slice(0,limit)}
