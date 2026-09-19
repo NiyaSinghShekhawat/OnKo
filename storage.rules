@@ -1,17 +1,7 @@
 rules_version = '2';
-
 service firebase.storage {
-  match /b/{bucket}/o {
-    // Medical reports are accessed only through the authenticated
-    // server-side API, which performs patient/doctor authorization
-    // and issues short-lived signed URLs.
-    match /medical-reports/{patientId}/{reportId}/{fileName} {
-      allow read, write: if false;
-    }
-
-    // No other client-side Storage access is currently part of OnKo.
-    match /{allPaths=**} {
-      allow read, write: if false;
-    }
-  }
+ match /b/{bucket}/o {
+  match /medical-reports/{patientId}/{reportId}/{fileName} { allow read,write: if false; }
+  match /{allPaths=**} { allow read,write: if false; }
+ }
 }
