@@ -1,0 +1,1 @@
+export interface EuropePMCResult {id?:string;pmid?:string;pmcid?:string;title?:string;authorString?:string;authorList?:{author?:{fullName?:string}[]} ;pubYear?:string;firstPublicationDate?:string;abstractText?:string;doi?:string;}
