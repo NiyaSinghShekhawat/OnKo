@@ -1,1 +1,4 @@
-import {authenticatedFetch} from "@/lib/api/authenticatedFetch";import type {Notification} from "@/types/notification";export async function getPatientNotifications(){const r=await authenticatedFetch("/api/patient/notifications");if(!r.ok)throw new Error("Unable to load notifications.");return (await r.json()).notifications as Notification[]}
+import {authenticatedFetch} from "@/lib/api/authenticatedFetch";
+import type {Notification} from "@/types/notification";
+export async function getPatientNotifications(){const r=await authenticatedFetch("/api/patient/notifications");if(!r.ok)throw new Error("Unable to load notifications.");return(await r.json()).notifications as Notification[]}
+export async function markPatientNotificationRead(notificationId:string){const r=await authenticatedFetch("/api/patient/notifications",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({notificationId})});if(!r.ok)throw new Error("Unable to mark notification as read.");return(await r.json()).notification as Notification}
