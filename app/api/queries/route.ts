@@ -1,15 +1,4 @@
-import { NextResponse } from "next/server";
-import { listQueries } from "@/backend/services/queryService";
-
-export async function GET() {
-  try {
-    const queries = await listQueries();
-    return NextResponse.json({ data: queries });
-  } catch (error) {
-    console.error("GET /api/queries failed", error);
-    return NextResponse.json(
-      { error: "Unable to load queries." },
-      { status: 500 },
-    );
-  }
-}
+import { NextRequest,NextResponse } from "next/server";
+import { requirePatient } from "@/backend/api/auth";
+import { listQueriesForPatient } from "@/backend/services/queryService";
+export async function GET(request:NextRequest){const a=await requirePatient(request);if("error" in a)return a.error;try{return NextResponse.json({data:await listQueriesForPatient(a.patientId)});}catch(e){console.error(e);return NextResponse.json({error:"Unable to load queries."},{status:500});}}

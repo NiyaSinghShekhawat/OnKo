@@ -1,15 +1,4 @@
-import { NextResponse } from "next/server";
-import { listCareJourneys } from "@/backend/services/careJourneyService";
-
-export async function GET() {
-  try {
-    const journeys = await listCareJourneys();
-    return NextResponse.json({ data: journeys });
-  } catch (error) {
-    console.error("GET /api/care-journey failed", error);
-    return NextResponse.json(
-      { error: "Unable to load care journeys." },
-      { status: 500 },
-    );
-  }
-}
+import { NextRequest,NextResponse } from "next/server";
+import { requirePatient } from "@/backend/api/auth";
+import { listCareJourneysForPatient } from "@/backend/services/careJourneyService";
+export async function GET(request:NextRequest){const a=await requirePatient(request);if("error" in a)return a.error;try{return NextResponse.json({data:await listCareJourneysForPatient(a.patientId)});}catch(e){console.error(e);return NextResponse.json({error:"Unable to load care journey."},{status:500});}}

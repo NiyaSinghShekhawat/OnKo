@@ -1,69 +1,30 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  type CollectionReference,
-  type DocumentData,
-  type DocumentReference,
-  type Query,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import { type DocumentData, type Query } from "firebase-admin/firestore";
+import { getAdminDb } from "@/lib/firebase/admin";
 import { COLLECTIONS, type FirestoreCollection } from "../types/firestore";
 
-export function collectionRef<T extends DocumentData>(
-  collectionName: FirestoreCollection,
-): CollectionReference<T> {
-  return collection(db, COLLECTIONS[collectionName]) as CollectionReference<T>;
+export function collectionRef<T extends DocumentData>(name: FirestoreCollection) {
+  return getAdminDb().collection(COLLECTIONS[name]) as FirebaseFirestore.CollectionReference<T>;
 }
-
-export function documentRef<T extends DocumentData>(
-  collectionName: FirestoreCollection,
-  documentId: string,
-): DocumentReference<T> {
-  return doc(db, COLLECTIONS[collectionName], documentId) as DocumentReference<T>;
+export function documentRef<T extends DocumentData>(name: FirestoreCollection, id: string) {
+  return collectionRef<T>(name).doc(id);
 }
-
-export async function getDocument<T extends DocumentData>(
-  collectionName: FirestoreCollection,
-  documentId: string,
-): Promise<T | null> {
-  const snapshot = await getDoc(documentRef<T>(collectionName, documentId));
-  return snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as T) : null;
+export async function getDocument<T extends DocumentData>(name: FirestoreCollection, id: string): Promise<T | null> {
+  const s = await documentRef<T>(name, id).get();
+  return s.exists ? ({ id: s.id, ...s.data() } as T) : null;
 }
-
-export async function listDocuments<T extends DocumentData>(
-  collectionName: FirestoreCollection,
-  constraints: Query<T> | null = null,
-): Promise<T[]> {
-  const target = constraints ?? collectionRef<T>(collectionName);
-  const snapshot = await getDocs(target);
-  return snapshot.docs.map((item) => ({ id: item.id, ...item.data() } as T));
+export async function listDocuments<T extends DocumentData>(name: FirestoreCollection, q?: Query<T> | null): Promise<T[]> {
+  const s = await (q ?? collectionRef<T>(name)).get();
+  return s.docs.map(d => ({ id: d.id, ...d.data() } as T));
 }
-
-export async function createDocument<T extends DocumentData>(
-  collectionName: FirestoreCollection,
-  data: T,
-): Promise<string> {
-  const created = await addDoc(collectionRef<T>(collectionName), data);
-  return created.id;
+export async function listDocumentsByField<T extends DocumentData>(name: FirestoreCollection, field: string, value: string): Promise<T[]> {
+  return listDocuments<T>(name, collectionRef<T>(name).where(field, "==", value) as Query<T>);
 }
-
-export async function setDocument<T extends DocumentData>(
-  collectionName: FirestoreCollection,
-  documentId: string,
-  data: T,
-): Promise<void> {
-  await setDoc(documentRef<T>(collectionName, documentId), data);
+export async function createDocument<T extends DocumentData>(name: FirestoreCollection, data: T) {
+  return (await collectionRef<T>(name).add(data)).id;
 }
-
-export async function removeDocument(
-  collectionName: FirestoreCollection,
-  documentId: string,
-): Promise<void> {
-  await deleteDoc(documentRef(collectionName, documentId));
+export async function setDocument<T extends DocumentData>(name: FirestoreCollection, id: string, data: T) {
+  await documentRef<T>(name, id).set(data);
+}
+export async function removeDocument(name: FirestoreCollection, id: string) {
+  await documentRef(name, id).delete();
 }

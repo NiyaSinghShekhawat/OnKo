@@ -1,37 +1,13 @@
-"use client";
+import { getAdminAuth } from "@/lib/firebase/admin";
+import type { DecodedIdToken } from "firebase-admin/auth";
 
-import {
-  onAuthStateChanged,
-  signOut,
-  type User,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase/client";
-import type { AuthUser } from "../types/auth";
-
-export function mapFirebaseUser(user: User | null): AuthUser | null {
-  if (!user) return null;
-
-  const role = (user.displayName?.startsWith("doctor:")
-    ? "doctor"
-    : user.displayName?.startsWith("admin:")
-      ? "admin"
-      : user.displayName?.startsWith("caregiver:")
-        ? "caregiver"
-        : "patient") as AuthUser["role"];
-
-  return {
-    uid: user.uid,
-    email: user.email,
-    role,
-  };
+export async function verifyBearerToken(header: string | null): Promise<DecodedIdToken> {
+  if (!header?.startsWith("Bearer ")) throw new Error("Missing authentication token.");
+  return getAdminAuth().verifyIdToken(header.slice(7).trim());
 }
-
-export function subscribeToAuth(
-  callback: (user: AuthUser | null) => void,
-) {
-  return onAuthStateChanged(auth, (user) => callback(mapFirebaseUser(user)));
-}
-
-export function logout() {
-  return signOut(auth);
+export function patientIdFromToken(token: DecodedIdToken) {
+  if (token.role !== "patient" || typeof token.patientId !== "string" || !token.patientId) {
+    throw new Error("Authenticated account is not linked to a patient.");
+  }
+  return token.patientId;
 }

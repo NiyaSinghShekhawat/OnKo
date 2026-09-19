@@ -1,8 +1,3 @@
 import type { CareJourney } from "@/types/careJourney";
-
-export async function fetchCareJourneys(): Promise<CareJourney[]> {
-  const response = await fetch("/api/care-journey", { cache: "no-store" });
-  if (!response.ok) throw new Error("Unable to load care journeys.");
-  const payload = await response.json();
-  return payload.data as CareJourney[];
-}
+import { authenticatedFetch } from "./authenticatedFetch";
+export async function fetchCareJourneys():Promise<CareJourney[]>{const r=await authenticatedFetch("/api/care-journey");if(!r.ok)throw new Error("Unable to load care journeys.");return (await r.json()).data as CareJourney[];}

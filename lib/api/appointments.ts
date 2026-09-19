@@ -1,8 +1,3 @@
 import type { Appointment } from "@/types/appointment";
-
-export async function fetchAppointments(): Promise<Appointment[]> {
-  const response = await fetch("/api/appointments", { cache: "no-store" });
-  if (!response.ok) throw new Error("Unable to load appointments.");
-  const payload = await response.json();
-  return payload.data as Appointment[];
-}
+import { authenticatedFetch } from "./authenticatedFetch";
+export async function fetchAppointments():Promise<Appointment[]>{const r=await authenticatedFetch("/api/appointments");if(!r.ok)throw new Error("Unable to load appointments.");return (await r.json()).data as Appointment[];}
