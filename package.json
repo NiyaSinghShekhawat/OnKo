@@ -9,7 +9,8 @@
     "lint": "next lint",
     "provision:patient": "tsx backend/scripts/provisionPatient.ts",
     "seed:demo": "tsx backend/scripts/seedDemoPatient.ts",
-    "test:ai-intent": "tsx backend/ai/tests/patientIntentRouter.test.ts"
+    "test:ai-intent": "tsx backend/ai/tests/patientIntentRouter.test.ts",
+    "test:core": "tsx backend/tests/core.test.ts"
   },
   "dependencies": {
     "firebase": "^12.2.1",
