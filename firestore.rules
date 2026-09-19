@@ -6,6 +6,7 @@ service cloud.firestore {
     function isPatient(patientId){return signedIn() && request.auth.token.role == "patient" && request.auth.token.patientId == patientId;}
     function isAssignedDoctor(patientId){return signedIn() && request.auth.token.role == "doctor" && exists(/databases/$(database)/documents/patients/$(patientId)) && get(/databases/$(database)/documents/patients/$(patientId)).data.doctorId == request.auth.token.doctorId;}
     function canReadPatientResource(patientId){return isAdmin() || isPatient(patientId) || isAssignedDoctor(patientId);}
+    function canReadPatientNotification(patientId){return isAdmin() || isPatient(patientId);}
     match /patients/{patientId}{allow read: if isAdmin() || isPatient(patientId) || isAssignedDoctor(patientId);allow create,update,delete: if false;}
     match /appointments/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
     match /medicines/{id}{allow read: if canReadPatientResource(resource.data.patientId);allow create,update,delete: if false;}
