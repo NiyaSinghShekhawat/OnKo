@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/client";
+import { getOnKoRole } from "@/lib/firebase/clientAuth";
 import { PatientHeader } from "./PatientHeader";
 import { PatientSidebar } from "./PatientSidebar";
 
@@ -12,13 +13,33 @@ export function PatientShell({ children }: { children: ReactNode }) {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    return auth.onAuthStateChanged((user) => {
+    let active = true;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        router.replace(`/login?role=patient&next=${encodeURIComponent(pathname || "/patient")}`);
+        if (active) router.replace(`/login?role=patient&next=${encodeURIComponent(pathname || "/patient")}`);
         return;
       }
-      setCheckingAuth(false);
+      try {
+        const role = await getOnKoRole(user);
+        if (!active) return;
+        if (role !== "patient") {
+          await auth.signOut();
+          router.replace(`/login?role=patient&next=${encodeURIComponent(pathname || "/patient")}&error=wrong-role`);
+          return;
+        }
+        setCheckingAuth(false);
+      } catch (error) {
+        console.error("Patient role verification failed", error);
+        if (active) {
+          await auth.signOut();
+          router.replace(`/login?role=patient&next=${encodeURIComponent(pathname || "/patient")}&error=session`);
+        }
+      }
     });
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [pathname, router]);
 
   if (checkingAuth) {
