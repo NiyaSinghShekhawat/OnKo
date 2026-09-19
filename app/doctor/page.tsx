@@ -1,6 +1,7 @@
 import DoctorSidebar from "@/doctor-dashboard/components/DoctorSidebar";
 import DoctorHeader from "@/doctor-dashboard/components/DoctorHeader";
 import DoctorOverviewFoundation from "@/doctor-dashboard/components/DoctorOverviewFoundation";
+import DoctorPatientManagement from "@/doctor-dashboard/components/DoctorPatientManagement";
 
 export default function DoctorPage() {
   return (
@@ -9,6 +10,7 @@ export default function DoctorPage() {
       <main className="doctor-main">
         <DoctorHeader />
         <DoctorOverviewFoundation />
+        <DoctorPatientManagement />
       </main>
     </div>
   );

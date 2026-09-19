@@ -76,3 +76,28 @@
 @media(max-width:1000px){.doctor-metric-grid{grid-template-columns:1fr 1fr}.doctor-content-grid{grid-template-columns:1fr}}
 @media(max-width:720px){.doctor-shell{grid-template-columns:76px minmax(0,1fr)}.doctor-sidebar{padding:16px 8px}.doctor-brand{justify-content:center;padding-inline:0}.doctor-brand>div:last-child,.doctor-section-label,.doctor-sidebar-link span:not(.doctor-sidebar-icon),.doctor-security{display:none}.doctor-sidebar-link{justify-content:center;padding-inline:0}.doctor-topbar{padding-inline:18px}.doctor-page{padding-inline:18px}}
 @media(max-width:560px){.doctor-shell{display:block}.doctor-sidebar{position:static;width:100%;height:auto;border-right:0;border-bottom:1px solid var(--onko-line)}.doctor-brand{justify-content:flex-start}.doctor-brand>div:last-child,.doctor-section-label{display:block}.doctor-sidebar-nav{display:flex;overflow-x:auto}.doctor-sidebar-link{flex:0 0 auto}.doctor-sidebar-link span:not(.doctor-sidebar-icon){display:inline}.doctor-topbar{align-items:flex-start;flex-direction:column}.doctor-header-actions{width:100%;justify-content:flex-end}.doctor-metric-grid{grid-template-columns:1fr 1fr}}
+
+.doctor-patient-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.doctor-patient-toolbar h2{margin:6px 0 4px;font-size:16px}
+.doctor-patient-toolbar p{margin:0;color:var(--onko-muted);font-size:9px}
+.doctor-directory-count{padding:7px 9px;border-radius:99px;background:var(--onko-teal-soft);color:var(--onko-teal);font-size:8px;font-weight:800;white-space:nowrap}
+.doctor-patient-controls{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:10px;margin-bottom:14px}
+.doctor-patient-controls input,.doctor-patient-controls select{min-height:36px;border:1px solid var(--onko-line);border-radius:7px;background:#fff;padding:8px 10px;color:var(--onko-ink);font-size:9px;outline:none}
+.doctor-patient-controls input:focus,.doctor-patient-controls select:focus{border-color:var(--onko-teal)}
+.doctor-patient-table-wrap{overflow-x:auto}
+.doctor-patient-table{width:100%;border-collapse:collapse;min-width:720px}
+.doctor-patient-table th{padding:9px 10px;text-align:left;color:var(--onko-muted);font-size:7px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--onko-line)}
+.doctor-patient-table td{padding:11px 10px;border-bottom:1px solid #edf1f1;color:#53666a;font-size:8px;vertical-align:middle}
+.doctor-patient-table td:first-child{color:var(--onko-ink)}
+.doctor-patient-table td strong,.doctor-patient-table td span{display:block}
+.doctor-patient-table td span{margin-top:3px;color:var(--onko-muted);font-size:7px}
+.doctor-phase-pill{display:inline-flex!important;width:max-content;padding:5px 7px;border-radius:99px;background:var(--onko-teal-soft);color:var(--onko-teal)!important;font-weight:700}
+.doctor-progress{display:flex;align-items:center;gap:7px;min-width:100px}
+.doctor-progress>div{width:65px;height:5px;overflow:hidden;border-radius:99px;background:#e7eeee}
+.doctor-progress>div span{display:block;height:100%;border-radius:99px;background:var(--onko-teal)}
+.doctor-progress small{font-size:7px;color:var(--onko-muted)}
+.doctor-open-patient{border:1px solid var(--onko-line);border-radius:6px;background:#fff;padding:6px 8px;color:var(--onko-ink);font-size:8px;font-weight:700;cursor:pointer}
+.doctor-open-patient:hover{background:#f1f6f6}
+.doctor-directory-state{padding:34px 14px;text-align:center;color:var(--onko-muted);font-size:9px}
+.doctor-directory-error{color:var(--onko-red)}
+@media(max-width:700px){.doctor-patient-controls{grid-template-columns:1fr}.doctor-patient-toolbar{flex-direction:column}}
