@@ -1,0 +1,1 @@
+export type NotificationType="appointment-reminder"|"milestone-reminder"|"doctor-update"|"query-update"|"safety-alert";export interface Notification{notificationId:string;patientId:string;type:NotificationType;title:string;message:string;createdAt:string;readAt?:string;channel:"in-app"|"whatsapp";status:"pending"|"sent"|"read"|"failed";metadata?:Record<string,string>;}

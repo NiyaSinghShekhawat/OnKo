@@ -1,0 +1,1 @@
+import {NextRequest,NextResponse} from "next/server";import {getPatientNotifications} from "@/backend/api/notifications";export async function GET(req:NextRequest){try{return NextResponse.json({notifications:await getPatientNotifications(req)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to load notifications."},{status:500})}}
