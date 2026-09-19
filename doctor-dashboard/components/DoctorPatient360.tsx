@@ -1,3 +1,5 @@
+"use client";
+
 function AIWorkspaceLinks({patientId}:{patientId:string}){return <section className="doctor-card"><span className="doctor-eyebrow">AI PATIENT 360</span><h2>AI-assisted care workspace</h2><p className="doctor-muted-text">Review AI summaries, engagement signals and evidence before making any care-team decision.</p><div><a href={"/doctor/signals?patientId="+encodeURIComponent(patientId)}>Engagement signals</a>{" · "}<a href={"/doctor/reference"}>Medical reference</a>{" · "}<a href={"/api/doctor/ai/care-journey-summary?patientId="+encodeURIComponent(patientId)} target="_blank" rel="noreferrer">Care journey summary</a></div></section>}
 "use client";
 import { useEffect,useMemo,useState } from "react";
