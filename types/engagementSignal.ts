@@ -1,0 +1,3 @@
+export type EngagementSignalType="missed-milestone"|"missed-follow-up"|"repeated-delay"|"open-query"|"engagement-change"|"patient-sos";
+export type EngagementSignalStatus="pending-review"|"reviewed"|"dismissed";
+export interface EngagementSignal{signalId:string;patientId:string;doctorId:string;type:EngagementSignalType;title:string;description:string;detectedAt:string;status:EngagementSignalStatus;source:string;}

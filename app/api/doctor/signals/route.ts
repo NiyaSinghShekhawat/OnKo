@@ -1,0 +1,4 @@
+import { NextRequest,NextResponse } from "next/server";
+import { requireDoctor } from "@/backend/api/auth";
+import { detectDoctorSignals, listDoctorSignals, saveDoctorSignal } from "@/backend/services/engagementSignalService";
+export async function GET(request:NextRequest){const a=await requireDoctor(request);if("error"in a)return a.error;try{const detected=await detectDoctorSignals(a.doctorId);const existing=await listDoctorSignals(a.doctorId);const ids=new Set(existing.map(x=>x.signalId));for(const s of detected)if(!ids.has(s.signalId))await saveDoctorSignal(s);return NextResponse.json({data:detected.filter(s=>!ids.has(s.signalId)).concat(existing.filter(s=>s.status==="pending-review"))})}catch(e){console.error(e);return NextResponse.json({error:"Unable to load engagement signals."},{status:500})}}

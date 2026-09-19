@@ -1,0 +1,2 @@
+import type { EngagementSignal } from "@/types/engagementSignal";import {authenticatedFetch} from "./authenticatedFetch";
+export async function fetchDoctorSignals():Promise<EngagementSignal[]>{const r=await authenticatedFetch("/api/doctor/signals");if(!r.ok)throw new Error("Unable to load signals.");return(await r.json()).data as EngagementSignal[]}
