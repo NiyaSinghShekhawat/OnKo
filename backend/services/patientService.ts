@@ -1,14 +1,3 @@
-import type { Patient } from "@/types/patient";
-import { getDocument, listDocuments, listDocumentsByField } from "../firebase/firestore";
-
-export function getPatient(patientId: string) {
-  return getDocument<Patient>("patients", patientId);
-}
-
-export function listPatients() {
-  return listDocuments<Patient>("patients");
-}
-
-export function listPatientsByDoctor(doctorId: string) {
-  return listDocumentsByField<Patient>("patients", "doctorId", doctorId);
-}
+import type { Patient, CareJourneyState } from "@/types/patient";import {getDocument,listDocuments,listDocumentsByField,setDocument} from "../firebase/firestore";
+export function getPatient(patientId:string){return getDocument<Patient>("patients",patientId)}export function listPatients(){return listDocuments<Patient>("patients")}export function listPatientsByDoctor(doctorId:string){return listDocumentsByField<Patient>("patients","doctorId",doctorId)}
+export async function updatePatientCarePhase(patientId:string,doctorId:string,currentCarePhase:CareJourneyState){const p=await getPatient(patientId);if(!p||p.doctorId!==doctorId)throw new Error("Patient not found.");const next={...p,currentCarePhase,lastUpdatedAt:new Date().toISOString()};await setDocument<Patient>("patients",patientId,next);return next}
