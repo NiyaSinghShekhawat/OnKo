@@ -1,2 +1,3 @@
-import {NextRequest} from "next/server";import {requireDoctor} from "@/backend/api/auth";import {detectAndStoreEngagementSignals,listPatientEngagementSignals} from "@/backend/services/engagementSignalService";
+import {NextRequest} from "next/server";import {requireDoctor} from "@/backend/api/auth";import {detectAndStoreEngagementSignals,listPatientEngagementSignals,reviewEngagementSignal} from "@/backend/services/engagementSignalService";
 export async function getDoctorEngagementSignals(req:NextRequest,patientId:string){const auth=await requireDoctor(req);await detectAndStoreEngagementSignals(patientId,auth.doctorId);return listPatientEngagementSignals(patientId)}
+export async function reviewDoctorEngagementSignal(req:NextRequest,signalId:string,status:"reviewed"|"dismissed",reviewNote?:string){const auth=await requireDoctor(req);return reviewEngagementSignal(signalId,auth.doctorId,status,reviewNote)}
