@@ -13,7 +13,8 @@
     "test:ai-intent": "tsx backend/ai/tests/patientIntentRouter.test.ts",
     "test:core": "tsx backend/tests/core.test.ts",
     "test:storage": "tsx backend/tests/reportStorage.test.ts",
-    "test:whatsapp": "tsx backend/tests/whatsappDelivery.test.ts"
+    "test:whatsapp": "tsx backend/tests/whatsappDelivery.test.ts",
+    "setup:demo": "npm run seed:demo && npm run provision:demo"
   },
   "dependencies": {
     "firebase": "^12.2.1",
