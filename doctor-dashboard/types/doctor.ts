@@ -1,4 +1,5 @@
 export type DoctorNavItem =
+  | "ai"
   | "overview"
   | "patients"
   | "queries"
