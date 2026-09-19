@@ -10,6 +10,6 @@ export async function getDoctorOverview(doctorId:string){
  const scopedQueries=queries.filter(x=>ids.has(x.patientId)&&x.doctorId===doctorId);
  const scopedReports=reports.filter(x=>ids.has(x.patientId));
  const scopedMilestones=milestones.filter(x=>ids.has(x.patientId));
- const today=new Date().toISOString().slice(0,10);
+ const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  return {totalPatients:patients.length,activePatients:patients.filter(p=>p.currentCarePhase!=="deceased").length,todayAppointments:scopedAppointments.filter(x=>x.date===today&&x.status==="scheduled").length,pendingQueries:scopedQueries.filter(x=>x.status==="open").length,reportsForReview:scopedReports.filter(x=>x.status==="uploaded").length,upcomingFollowUps:scopedAppointments.filter(x=>x.date>=today&&x.status==="scheduled").length,recentActivity:[...scopedMilestones.map(x=>({date:x.completedAt??x.dueDate,title:x.title,detail:`Milestone · ${x.status}`})),...scopedQueries.map(x=>({date:x.updatedAt,title:x.subject,detail:`Query · ${x.status}`})),...scopedReports.map(x=>({date:x.uploadedAt,title:x.title,detail:`Report · ${x.status}`}))].sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()).slice(0,6)};
 }
