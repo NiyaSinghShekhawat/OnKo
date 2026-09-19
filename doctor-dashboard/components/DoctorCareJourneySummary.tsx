@@ -1,0 +1,9 @@
+"use client";
+import {useState} from "react";
+import {authenticatedFetch} from "@/lib/api/authenticatedFetch";
+type Summary={summary:string;keyPoints:string[];limitations:string[];model:string;disclaimer:string};
+export default function DoctorCareJourneySummary({patientId}:{patientId:string}){
+ const[data,setData]=useState<Summary|null>(null);const[loading,setLoading]=useState(false);const[error,setError]=useState<string|null>(null);
+ const load=async()=>{try{setLoading(true);setError(null);const r=await authenticatedFetch("/api/doctor/ai/care-journey-summary?patientId="+encodeURIComponent(patientId));if(!r.ok)throw new Error("Unable to generate care journey summary.");setData(await r.json())}catch(e){setError(e instanceof Error?e.message:"Unable to generate care journey summary.")}finally{setLoading(false)}};
+ return <article className="doctor-card"><span className="doctor-eyebrow">AI CARE JOURNEY SUMMARY</span><h2>Longitudinal journey overview</h2><p className="doctor-muted-text">AI summarizes documented journey activity; the clinician-defined care phase remains authoritative.</p><button onClick={load} disabled={loading}>{loading?"Generating…":"Generate journey summary"}</button>{error&&<p className="doctor-directory-error">{error}</p>}{data&&<div className="doctor-ai-insights"><strong>{data.summary}</strong>{data.keyPoints?.length>0&&<ul>{data.keyPoints.map((x,i)=><li key={i}>{x}</li>)}</ul>}{data.limitations?.length>0&&<><strong>Limitations</strong><ul>{data.limitations.map((x,i)=><li key={i}>{x}</li>)}</ul></>}<small>{data.model} · {data.disclaimer}</small></div>}</article>
+}
