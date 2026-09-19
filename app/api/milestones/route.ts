@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePatient } from "@/backend/api/auth";
 import { listMilestonesForPatient } from "@/backend/services/milestoneService";
+import { createDocument } from "@/backend/firebase/firestore";
 
 export async function GET(request: NextRequest) {
   const auth = await requirePatient(request);
@@ -40,6 +41,7 @@ export async function PATCH(request: NextRequest) {
       completedAt: existing.completedAt ?? new Date().toISOString(),
     };
     await setDocument("milestones", milestoneId, next);
+    await createDocument("auditLogs", { auditId: "milestone-completed-" + milestoneId + "-" + Date.now(), actorId: auth.patientId, actorRole: "patient", action: "milestone_completed", entityType: "milestone", entityId: milestoneId, patientId: auth.patientId, createdAt: new Date().toISOString() });
     const milestones = await (await import("@/backend/services/milestoneService")).listMilestonesForPatient(auth.patientId);
     const activeMilestones = milestones.filter((m) => m.status !== "cancelled");
     const completedMilestones = activeMilestones.filter((m) => m.status === "completed").length;
