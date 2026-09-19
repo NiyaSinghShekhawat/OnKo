@@ -1,4 +1,3 @@
-function AIWorkspaceLinks({patientId}:{patientId:string}){return <section className="doctor-card"><span className="doctor-eyebrow">AI PATIENT 360</span><h2>AI-assisted care workspace</h2><p className="doctor-muted-text">Review AI summaries, engagement signals and evidence before making any care-team decision.</p><div><a href={"/doctor/signals?patientId="+encodeURIComponent(patientId)}>Engagement signals</a>{" · "}<a href={"/doctor/reference"}>Medical reference</a>{" · "}<a href={"/api/doctor/ai/care-journey-summary?patientId="+encodeURIComponent(patientId)} target="_blank" rel="noreferrer">Care journey summary</a></div></section>}
 "use client";
 import { useEffect,useMemo,useState } from "react";
 import type { Patient } from "@/types/patient";
@@ -16,7 +15,8 @@ import { updateDoctorCarePhase } from "@/lib/api/doctorCarePhase";
 import { fetchDoctorCaregivers, createDoctorCaregiver, updateDoctorCaregiver } from "@/lib/api/doctorCaregiver";
 import type { Caregiver, CaregiverAccessStatus } from "@/types/caregiver";
 import { reviewDoctorReport } from "@/lib/api/doctorReport";
-import DoctorPatientAIInsights from "./DoctorPatientAIInsights";\nimport DoctorMedicalReference from "./DoctorMedicalReference";
+import DoctorPatientAIInsights from "./DoctorPatientAIInsights";
+import DoctorMedicalReference from "./DoctorMedicalReference";
 export default function DoctorPatient360({patientId,onBack}:{patientId:string;onBack:()=>void}) {
  const [data,setData]=useState<Awaited<ReturnType<typeof fetchDoctorPatient360>>|null>(null); const [error,setError]=useState<string|null>(null); const [loading,setLoading]=useState(true);
  useEffect(()=>{let active=true;const unsub=auth.onIdTokenChanged(async user=>{if(!user){if(active){setError("Sign in with a doctor account to view patient history.");setLoading(false)}return}try{setLoading(true);setError(null);const [d,c]=await Promise.all([fetchDoctorPatient360(patientId),fetchDoctorCaregivers(patientId)]);if(active){setData(d);setCaregivers(c)}}catch(e){console.error(e);if(active)setError("Unable to load this patient history.")}finally{if(active)setLoading(false)}});return()=>{active=false;unsub()}},[patientId]);
