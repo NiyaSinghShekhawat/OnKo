@@ -1,0 +1,1 @@
+import {NextRequest} from "next/server";import {GET,POST,PATCH} from "@/backend/api/doctorActionTasks";export {GET,POST,PATCH};
