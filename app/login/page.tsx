@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getIdTokenResult, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
@@ -12,7 +12,7 @@ const DEMO = {
   patient: { email: "patient.demo@onko.example", password: "OnKoDemo@2026!" },
 };
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedRole: Role = searchParams.get("role") === "doctor" ? "doctor" : "patient";
@@ -130,5 +130,13 @@ export default function LoginPage() {
       </section>
       <p style={{ position: "fixed", bottom: 10, fontSize: 12, color: "#718287" }}>OnKo prototype · Synthetic data only · Human clinical oversight</p>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<main style={{ minHeight: "100vh", display: "grid", placeItems: "center", fontFamily: "Arial, sans-serif", color: "#123f48" }}>Loading OnKo…</main>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
