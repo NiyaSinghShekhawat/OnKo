@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePatient } from "@/backend/api/auth";
 import { listMilestonesForPatient } from "@/backend/services/milestoneService";
+import { syncPatientJourneyProgress } from "@/backend/services/progressService";
 
 export async function GET(request: NextRequest) {
   const auth = await requirePatient(request);
@@ -40,7 +41,8 @@ export async function PATCH(request: NextRequest) {
       completedAt: existing.completedAt ?? new Date().toISOString(),
     };
     await setDocument("milestones", milestoneId, next);
-    return NextResponse.json({ data: next });
+    const progress = await syncPatientJourneyProgress(auth.patientId);
+    return NextResponse.json({ data: next, progress });
   } catch (error) {
     console.error("PATCH /api/milestones failed", error);
     return NextResponse.json({ error: "Unable to complete milestone." }, { status: 500 });
