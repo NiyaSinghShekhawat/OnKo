@@ -1,3 +1,4 @@
 import {authenticatedFetch} from "./authenticatedFetch";import type {Patient} from "@/types/patient";import type {EngagementSignal} from "@/types/engagementSignal";import type {DoctorOverview} from "./doctorOverview";
 export interface DoctorAICommandCenter{overview:DoctorOverview;patients:Array<Pick<Patient,"patientId"|"name"|"currentCarePhase"|"journeyProgress"|"lastUpdatedAt">>;signals:EngagementSignal[]}
 export async function fetchDoctorAICommandCenter():Promise<DoctorAICommandCenter>{const r=await authenticatedFetch("/api/doctor/ai/command-center");if(!r.ok)throw new Error("Unable to load doctor AI command center.");return(await r.json()).data;}
+export async function reviewDoctorCommandSignal(input:{signalId:string;status:"reviewed"|"dismissed";note?:string}){const r=await authenticatedFetch("/api/doctor/signals",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to review signal.");return(await r.json()).data as EngagementSignal;}
