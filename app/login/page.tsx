@@ -17,6 +17,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const requestedRole: Role = searchParams.get("role") === "doctor" ? "doctor" : "patient";
   const next = searchParams.get("next") || (requestedRole === "doctor" ? "/doctor" : "/patient");
+  const loginError = searchParams.get("error");
 
   const [role, setRole] = useState<Role>(requestedRole);
   const [email, setEmail] = useState(DEMO[requestedRole].email);
@@ -28,7 +29,14 @@ export default function LoginPage() {
     setRole(requestedRole);
     setEmail(DEMO[requestedRole].email);
     setPassword(DEMO[requestedRole].password);
-  }, [requestedRole]);
+    setError(
+      loginError === "wrong-role"
+        ? "That account belongs to the other OnKo workspace. Select the matching portal."
+        : loginError === "session"
+          ? "Your OnKo session could not be verified. Please sign in again."
+          : ""
+    );
+  }, [requestedRole, loginError]);
 
   function chooseRole(value: Role) {
     setRole(value);
