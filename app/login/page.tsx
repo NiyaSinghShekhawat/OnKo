@@ -1,7 +1,7 @@
 "use client";
 
-import { FormEvent, Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getIdTokenResult, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 
@@ -14,18 +14,17 @@ const DEMO = {
 
 function LoginPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const requestedRole: Role = searchParams.get("role") === "doctor" ? "doctor" : "patient";
-  const next = searchParams.get("next") || (requestedRole === "doctor" ? "/doctor" : "/patient");
-  const loginError = searchParams.get("error");
-
-  const [role, setRole] = useState<Role>(requestedRole);
-  const [email, setEmail] = useState(DEMO[requestedRole].email);
-  const [password, setPassword] = useState(DEMO[requestedRole].password);
+  const [role, setRole] = useState<Role>("patient");
+  const [email, setEmail] = useState(DEMO.patient.email);
+  const [password, setPassword] = useState(DEMO.patient.password);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedRole: Role = params.get("role") === "doctor" ? "doctor" : "patient";
+    const loginError = params.get("error");
+
     setRole(requestedRole);
     setEmail(DEMO[requestedRole].email);
     setPassword(DEMO[requestedRole].password);
@@ -36,7 +35,7 @@ function LoginPageContent() {
           ? "Your OnKo session could not be verified. Please sign in again."
           : ""
     );
-  }, [requestedRole, loginError]);
+  }, []);
 
   function chooseRole(value: Role) {
     setRole(value);
@@ -64,7 +63,11 @@ function LoginPageContent() {
       router.replace(destination);
     } catch (err) {
       console.error("OnKo login failed", err);
-      setError(err instanceof Error && err.message.startsWith("This account") ? err.message : "Unable to sign in. Provision the demo accounts in Firebase Authentication first.");
+      setError(
+        err instanceof Error && err.message.startsWith("This account")
+          ? err.message
+          : "Unable to sign in. Provision the demo accounts in Firebase Authentication first."
+      );
     } finally {
       setLoading(false);
     }
@@ -134,9 +137,5 @@ function LoginPageContent() {
 }
 
 export default function LoginPage() {
-  return (
-    <Suspense fallback={<main style={{ minHeight: "100vh", display: "grid", placeItems: "center", fontFamily: "Arial, sans-serif", color: "#123f48" }}>Loading OnKo…</main>}>
-      <LoginPageContent />
-    </Suspense>
-  );
+  return <LoginPageContent />;
 }
