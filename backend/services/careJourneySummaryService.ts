@@ -1,0 +1,2 @@
+import {getPatientContext} from "@/backend/ai/patientContext";import {summarizeCareJourney} from "@/backend/ai/careJourneySummary";
+export async function getCareJourneySummary(patientId:string,doctorId:string){const ctx=await getPatientContext(patientId,doctorId);return summarizeCareJourney(ctx)}

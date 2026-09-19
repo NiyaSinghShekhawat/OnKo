@@ -1,0 +1,2 @@
+import {NextRequest,NextResponse} from "next/server";import {getDoctorCareJourneySummary} from "@/backend/api/careJourneySummary";
+export async function GET(req:NextRequest){try{const patientId=new URL(req.url).searchParams.get("patientId");if(!patientId)return NextResponse.json({error:"patientId is required."},{status:400});return NextResponse.json(await getDoctorCareJourneySummary(req,patientId));}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to summarize care journey."},{status:500})}}

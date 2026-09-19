@@ -1,0 +1,1 @@
+export interface CareJourneySummary{summary:string;keyEvents:string[];pendingItems:string[];sourceSections:string[];model:string;disclaimer:string}
