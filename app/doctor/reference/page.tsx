@@ -1,0 +1,2 @@
+"use client";import DoctorMedicalReference from "@/doctor-dashboard/components/DoctorMedicalReference";
+export default function DoctorReferencePage(){return <main className="doctor-page"><div className="doctor-page-heading"><span className="doctor-eyebrow">MEDICAL REFERENCE</span><h1>AI Medical Reference</h1><p className="doctor-muted-text">Cancer-focused literature retrieval with grounded AI summarization and source evidence.</p></div><DoctorMedicalReference/></main>}
