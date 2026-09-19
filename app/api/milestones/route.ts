@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePatient } from "@/backend/api/auth";
 import { listMilestonesForPatient } from "@/backend/services/milestoneService";
-import { syncPatientJourneyProgress } from "@/backend/services/progressService";
 
 export async function GET(request: NextRequest) {
   const auth = await requirePatient(request);
@@ -41,8 +40,16 @@ export async function PATCH(request: NextRequest) {
       completedAt: existing.completedAt ?? new Date().toISOString(),
     };
     await setDocument("milestones", milestoneId, next);
-    const progress = await syncPatientJourneyProgress(auth.patientId);
-    return NextResponse.json({ data: next, progress });
+    const milestones = await (await import("@/backend/services/milestoneService")).listMilestonesForPatient(auth.patientId);
+    const activeMilestones = milestones.filter((m) => m.status !== "cancelled");
+    const completedMilestones = activeMilestones.filter((m) => m.status === "completed").length;
+    const journeyProgress = activeMilestones.length ? Math.round((completedMilestones / activeMilestones.length) * 100) : 0;
+    const { getDocument: getPatientDocument, setDocument: setPatientDocument } = await import("@/backend/firebase/firestore");
+    const patient = await getPatientDocument<import("@/types/patient").Patient>("patients", auth.patientId);
+    if (patient && patient.journeyProgress !== journeyProgress) {
+      await setPatientDocument("patients", auth.patientId, { ...patient, journeyProgress, lastUpdatedAt: new Date().toISOString() });
+    }
+    return NextResponse.json({ data: next, progress: { journeyProgress, milestoneCompletion: journeyProgress, totalMilestones: activeMilestones.length, completedMilestones } });
   } catch (error) {
     console.error("PATCH /api/milestones failed", error);
     return NextResponse.json({ error: "Unable to complete milestone." }, { status: 500 });
