@@ -1,5 +1,7 @@
 "use client";
 import { useEffect,useMemo,useState } from "react";
+import { collection,onSnapshot,query,where } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 import type { Patient } from "@/types/patient";
 import type { Milestone } from "@/types/milestone";
 import { auth } from "@/lib/firebase/client";
@@ -24,6 +26,7 @@ function AIWorkspaceLinks({patientId}:{patientId:string}){return <article classN
 export default function DoctorPatient360({patientId,onBack}:{patientId:string;onBack:()=>void}) {
  const [data,setData]=useState<Awaited<ReturnType<typeof fetchDoctorPatient360>>|null>(null); const [error,setError]=useState<string|null>(null); const [loading,setLoading]=useState(true);
  useEffect(()=>{let active=true;const unsub=auth.onIdTokenChanged(async user=>{if(!user){if(active){setError("Sign in with a doctor account to view patient history.");setLoading(false)}return}try{setLoading(true);setError(null);const [d,c]=await Promise.all([fetchDoctorPatient360(patientId),fetchDoctorCaregivers(patientId)]);if(active){setData(d);setCaregivers(c)}}catch(e){console.error(e);if(active)setError("Unable to load this patient history.")}finally{if(active)setLoading(false)}});return()=>{active=false;unsub()}},[patientId]);
+ useEffect(()=>{let active=true;let timer:ReturnType<typeof setTimeout>|null=null;const unsubs:(()=>void)[]=[];const start=async()=>{const user=auth.currentUser;if(!user)return;const token=await user.getIdTokenResult(true);if(token.claims.role!=="doctor")return;for(const resource of ["appointments","medicines","procedures","reports","queries","milestones","caregivers"]){const q=query(collection(db,resource),where("patientId","==",patientId));unsubs.push(onSnapshot(q,()=>{if(timer)clearTimeout(timer);timer=setTimeout(async()=>{try{const[d,c]=await Promise.all([fetchDoctorPatient360(patientId),fetchDoctorCaregivers(patientId)]);if(active){setData(d);setCaregivers(c)}}catch(e){console.error("Doctor realtime refresh failed",e)}},250)},e=>console.error("Doctor realtime listener failed",resource,e)))}};void start();return()=>{active=false;if(timer)clearTimeout(timer);unsubs.forEach(u=>u())}},[patientId]);
  const phase=(p:Patient["currentCarePhase"])=>({"active-treatment":"Active Treatment","remission-survivorship":"Remission / Survivorship",relapse:"Relapse","transfer-of-care":"Transfer of Care","palliative-end-of-life":"Palliative / End-of-Life",deceased:"Deceased"}[p]);
  const date=(v?:string)=>{if(!v)return"Not recorded";const d=new Date(v);return Number.isNaN(d.getTime())?v:new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(d)};
  const [newTitle,setNewTitle]=useState(""); const [newDueDate,setNewDueDate]=useState(""); const [newDescription,setNewDescription]=useState(""); const [saving,setSaving]=useState(false);
