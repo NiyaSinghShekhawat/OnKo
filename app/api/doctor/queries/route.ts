@@ -3,6 +3,7 @@ import { requireDoctor } from "@/backend/api/auth";
 import { getPatient } from "@/backend/services/patientService";
 import { getQuery } from "@/backend/services/queryService";
 import { setDocument } from "@/backend/firebase/firestore";
+import { notifyQueryUpdate } from "@/backend/services/notificationTriggers";
 import type { Query, QueryMessage } from "@/types/query";
 
 export async function POST(request: NextRequest) {
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
     const reply: QueryMessage = { messageId: crypto.randomUUID(), senderId: auth.doctorId, senderRole: "doctor", message, createdAt: now };
     const next: Query = { ...query, status: "answered", messages: [...query.messages, reply], updatedAt: now };
     await setDocument<Query>("queries", queryId, next);
+    await notifyQueryUpdate(query.patientId, queryId, query.subject);
     return NextResponse.json({ data: next });
   } catch (error) {
     console.error("POST /api/doctor/queries/reply failed", error);
