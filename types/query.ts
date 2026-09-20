@@ -17,5 +17,5 @@ export interface Query {
   status: QueryStatus;
   messages: QueryMessage[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string;\n  escalated?: boolean;\n  escalatedAt?: string;\n  escalatedBy?: string;
 }
