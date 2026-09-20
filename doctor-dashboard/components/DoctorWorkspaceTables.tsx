@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { authenticatedFetch } from "@/lib/api/authenticatedFetch";
 import type { Patient } from "@/types/patient";
 
@@ -9,8 +10,8 @@ type WorkspaceData = { patients: Patient[]; appointments: Row[]; medicines: Row[
 const phase: Record<string, string> = {"active-treatment":"Active treatment","remission-survivorship":"Remission / survivorship",relapse:"Relapse","transfer-of-care":"Transfer of care","palliative-end-of-life":"Palliative / end-of-life",deceased:"Deceased"};
 function date(value?: string){if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?value:new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(d);}
 function patientName(patients:Patient[],id:string){return patients.find(p=>p.patientId===id)?.name??id;}
-function Table({headers,children}:{headers:string[];children:React.ReactNode}){return <div className="doctor-workspace-table-wrap"><table className="doctor-workspace-table"><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>;}
-function Section({id,eyebrow,title,description,children,count}:{id:string;eyebrow:string;title:string;description:string;children:React.ReactNode;count?:number}){return <section id={id} className="doctor-card doctor-workspace-section"><div className="doctor-workspace-section-heading"><div><span className="doctor-eyebrow">{eyebrow}</span><h2>{title}</h2><p>{description}</p></div>{count!==undefined&&<span className="doctor-neutral-pill">{count} records</span>}</div>{children}</section>;}
+function Table({headers,children}:{headers:string[];children:ReactNode}){return <div className="doctor-workspace-table-wrap"><table className="doctor-workspace-table"><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>;}
+function Section({id,eyebrow,title,description,children,count}:{id:string;eyebrow:string;title:string;description:string;children:ReactNode;count?:number}){return <section id={id} className="doctor-card doctor-workspace-section"><div className="doctor-workspace-section-heading"><div><span className="doctor-eyebrow">{eyebrow}</span><h2>{title}</h2><p>{description}</p></div>{count!==undefined&&<span className="doctor-neutral-pill">{count} records</span>}</div>{children}</section>;}
 
 export default function DoctorWorkspaceTables(){
  const [data,setData]=useState<WorkspaceData|null>(null);const [loading,setLoading]=useState(true);const [error,setError]=useState("");const [queryFilter,setQueryFilter]=useState("all");const [carePlanFilter,setCarePlanFilter]=useState("all");const [message,setMessage]=useState("");
