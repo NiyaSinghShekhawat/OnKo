@@ -5,7 +5,8 @@ import type { CareJourneyState, Patient } from "@/types/patient";
 import { auth } from "@/lib/firebase/client";
 import { fetchDoctorPatients } from "@/lib/api/doctor";
 
-const phaseLabels: Record<CareJourneyState, string> = {
+const phaseLabels: Record<CareJourneyState, string> & { all: string } = {
+  all: "All care phases",
   "active-treatment": "Active Treatment",
   "remission-survivorship": "Remission / Survivorship",
   relapse: "Relapse",
