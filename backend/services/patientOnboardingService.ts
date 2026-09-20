@@ -4,7 +4,12 @@ import type { Patient } from "@/types/patient";
 import type { PatientOnboardingInput, PatientOnboardingReport, PatientOnboardingResult } from "@/types/patientOnboarding";
 
 function clean(value?: string) {
-  return value?.trim() || undefined;
+  const cleaned = value?.trim();
+  return cleaned || undefined;
+}
+
+function optionalField<T>(value: T | undefined): T | Record<string, never> {
+  return value === undefined ? {} : value;
 }
 
 function generatedPatientId() {
@@ -55,20 +60,20 @@ export async function onboardPatient(
     const patient: Patient & Record<string, unknown> = {
       patientId,
       name: input.name.trim(),
-      age: input.age,
-      diagnosisLabel: clean(input.diagnosisLabel),
+      ...optionalField(typeof input.age === "number" ? input.age : undefined),
+      ...optionalField(clean(input.diagnosisLabel)),
       currentCarePhase: input.currentCarePhase,
       doctorId,
       journeyProgress: Math.max(0, Math.min(100, Number(input.journeyProgress) || 0)),
       lastUpdatedAt: now,
       authUid: user.uid,
       email,
-      dateOfBirth: clean(input.dateOfBirth),
-      gender: clean(input.gender),
-      phone: clean(input.phone),
-      address: clean(input.address),
-      emergencyContactName: clean(input.emergencyContactName),
-      emergencyContactPhone: clean(input.emergencyContactPhone),
+      ...optionalField(clean(input.dateOfBirth)),
+      ...optionalField(clean(input.gender)),
+      ...optionalField(clean(input.phone)),
+      ...optionalField(clean(input.address)),
+      ...optionalField(clean(input.emergencyContactName)),
+      ...optionalField(clean(input.emergencyContactPhone)),
       accountStatus: "active",
     };
 
@@ -82,7 +87,7 @@ export async function onboardPatient(
         medicineId, patientId, name: medicine.name.trim(), dosage: medicine.dosage?.trim() || "",
         frequency: medicine.frequency?.trim() || "", instructions: medicine.instructions?.trim() || "",
         sideEffects: medicine.sideEffects ?? [], startDate: medicine.startDate || now.slice(0, 10),
-        endDate: clean(medicine.endDate), status: "active",
+        ...optionalField(clean(medicine.endDate)), status: "active",
       });
     }
 
@@ -91,8 +96,11 @@ export async function onboardPatient(
       const procedureId = randomUUID();
       batch.set(db.collection("procedures").doc(procedureId), {
         procedureId, patientId, name: procedure.name.trim(), date: procedure.date || now.slice(0, 10),
-        reason: clean(procedure.reason), purpose: clean(procedure.purpose), details: clean(procedure.details),
-        followUpDate: clean(procedure.followUpDate), notes: clean(procedure.notes),
+        ...optionalField(clean(procedure.reason)),
+        ...optionalField(clean(procedure.purpose)),
+        ...optionalField(clean(procedure.details)),
+        ...optionalField(clean(procedure.followUpDate)),
+        ...optionalField(clean(procedure.notes)),
         status: procedure.status || "scheduled",
       });
     }
@@ -101,9 +109,9 @@ export async function onboardPatient(
       if (!appointment.title?.trim()) continue;
       const appointmentId = randomUUID();
       batch.set(db.collection("appointments").doc(appointmentId), {
-        appointmentId, patientId, doctorId, title: appointment.title.trim(), date: appointment.date || now.slice(0, 10),
-        time: appointment.time || "", location: clean(appointment.location), status: appointment.status || "scheduled",
-        instructions: clean(appointment.instructions),
+        appointmentId, patientId, doctorId, title: appointment.title.trim(),date: appointment.date || now.slice(0, 10),
+        time: appointment.time || "", ...optionalField(clean(appointment.location)), status: appointment.status || "scheduled",
+        ...optionalField(clean(appointment.instructions)),
       });
     }
 
@@ -111,7 +119,8 @@ export async function onboardPatient(
       if (!milestone.title?.trim()) continue;
       const milestoneId = randomUUID();
       batch.set(db.collection("milestones").doc(milestoneId), {
-        milestoneId, patientId, title: milestone.title.trim(), description: clean(milestone.description),
+        milestoneId, patientId, title: milestone.title.trim(),
+        ...optionalField(clean(milestone.description)),
         dueDate: milestone.dueDate || now.slice(0, 10), status: milestone.status || "pending",
       });
     }
@@ -121,7 +130,7 @@ export async function onboardPatient(
       const caregiverId = randomUUID();
       batch.set(db.collection("caregivers").doc(caregiverId), {
         caregiverId, patientId, name: caregiver.name.trim(), relationship: caregiver.relationship?.trim() || "",
-        contact: clean(caregiver.contact), accessStatus: "invited", permissions: caregiver.permissions ?? [],
+        ...optionalField(clean(caregiver.contact)), accessStatus: "invited", permissions: caregiver.permissions ?? [],
       });
     }
 
@@ -153,9 +162,12 @@ export async function onboardPatient(
       }
       const reportId = randomUUID();
       batch.set(db.collection("reports").doc(reportId), {
-        reportId, patientId, title: report.title.trim(), reportType: clean(report.reportType),
+        reportId, patientId, title: report.title.trim(),
+        ...optionalField(clean(report.reportType)),
         uploadedAt: now, fileName: file?.name || report.title.trim(),
-        storagePath: reportStoragePath, status: "uploaded", notes: clean(report.notes),
+        ...optionalField(reportStoragePath),
+        status: "uploaded",
+        ...optionalField(clean(report.notes)),
       });
       reportCount++;
     }
