@@ -1,0 +1,4 @@
+import type {DoctorNote} from "@/types/doctorNote";import {authenticatedFetch} from "./authenticatedFetch";
+export async function fetchDoctorNotes(patientId?:string){const q=patientId?"?patientId="+encodeURIComponent(patientId):"";const r=await authenticatedFetch("/api/doctor/notes"+q);if(!r.ok)throw new Error("Unable to load doctor notes.");return(await r.json()).data as DoctorNote[];}
+export async function createDoctorNote(input:{patientId:string;title:string;content:string}){const r=await authenticatedFetch("/api/doctor/notes",{method:"POST",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to create doctor note.");return(await r.json()).data as DoctorNote;}
+export async function updateDoctorNote(input:{noteId:string;title?:string;content?:string}){const r=await authenticatedFetch("/api/doctor/notes",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to update doctor note.");return(await r.json()).data as DoctorNote;}
