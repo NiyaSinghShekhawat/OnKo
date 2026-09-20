@@ -1,0 +1,3 @@
+export type AIClinicalItemStatus="pending"|"accepted"|"edited"|"rejected";
+export interface AIClinicalItem{itemId:string;category:"diagnostic-consideration"|"treatment-consideration";text:string;rationale:string;evidence:string[];status:AIClinicalItemStatus;doctorEdit?:string;}
+export interface AIClinicalReview{reviewId:string;patientId:string;doctorId:string;generatedAt:string;model:string;items:AIClinicalItem[];limitations:string[];reviewStatus:"pending-review"|"partially-reviewed"|"reviewed";}
