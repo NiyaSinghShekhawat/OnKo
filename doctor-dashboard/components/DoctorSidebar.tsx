@@ -1,22 +1,24 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { DoctorNavEntry } from "../types/doctor";
 
-const navItems: Array<DoctorNavEntry & { href: string; match?: string }> = [
+const navItems: Array<DoctorNavEntry & { href: string; match?: string; tab?: string }> = [
   { id: "overview", label: "Overview", icon: "⌂", href: "/doctor", match: "/doctor" },
   { id: "ai", label: "AI Command Center", icon: "✦", href: "/doctor/ai", match: "/doctor/ai" },
   { id: "patients", label: "Patient Management", icon: "♙", href: "/doctor#patients" },
-  { id: "queries", label: "Queries / Triage", icon: "?", href: "/doctor#queries" },
-  { id: "reports", label: "Reports", icon: "▤", href: "/doctor#reports" },
-  { id: "care-plans", label: "Care Plans", icon: "✓", href: "/doctor#care-plans" },
+  { id: "queries", label: "Queries / Triage", icon: "?", href: "/doctor/workspace?tab=queries", match: "/doctor/workspace", tab: "queries" },
+  { id: "reports", label: "Reports", icon: "▤", href: "/doctor/workspace?tab=reports", match: "/doctor/workspace", tab: "reports" },
+  { id: "care-plans", label: "Care Plans", icon: "✓", href: "/doctor/workspace?tab=care-plans", match: "/doctor/workspace", tab: "care-plans" },
   { id: "alerts", label: "Alerts & Signals", icon: "!", href: "/doctor/signals", match: "/doctor/signals" },
-  { id: "caregivers", label: "Caregivers", icon: "♧", href: "/doctor#caregivers" },
-  { id: "audit", label: "Audit / Emergency", icon: "◈", href: "/doctor#audit" },
+  { id: "caregivers", label: "Caregivers", icon: "♧", href: "/doctor/workspace?tab=caregivers", match: "/doctor/workspace", tab: "caregivers" },
+  { id: "audit", label: "Audit / Emergency", icon: "◈", href: "/doctor/workspace?tab=audit", match: "/doctor/workspace", tab: "audit" },
 ];
 
 export default function DoctorSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get("tab");
 
   return (
     <aside className="doctor-sidebar">
@@ -32,9 +34,11 @@ export default function DoctorSidebar() {
 
       <nav className="doctor-sidebar-nav" aria-label="Doctor dashboard">
         {navItems.map((item) => {
-          const active = item.match
-            ? pathname === item.match
-            : false;
+          const active = item.match === "/doctor/workspace"
+            ? pathname === item.match && activeTab === item.tab
+            : item.match
+              ? pathname === item.match
+              : false;
 
           return (
             <a
@@ -43,9 +47,7 @@ export default function DoctorSidebar() {
               className={`doctor-sidebar-link${active ? " active" : ""}`}
               aria-current={active ? "page" : undefined}
             >
-              <span className="doctor-sidebar-icon" aria-hidden="true">
-                {item.icon}
-              </span>
+              <span className="doctor-sidebar-icon" aria-hidden="true">{item.icon}</span>
               <span>{item.label}</span>
             </a>
           );
