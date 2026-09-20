@@ -163,8 +163,9 @@ export async function onboardPatient(
       progressPercent: patient.journeyProgress, updatedAt: now, milestones: [],
     }, { merge: true });
 
-    batch.set(db.collection("auditLogs").doc(randomUUID()), {
-      auditId: randomUUID(), actorId: doctorId, actorRole: "doctor", action: "patient_onboarded",
+    const auditId = randomUUID();
+    batch.set(db.collection("auditLogs").doc(auditId), {
+      auditId, actorId: doctorId, actorRole: "doctor", action: "patient_onboarded",
       entityType: "patient", entityId: patientId, patientId,
       metadata: { authUid: user.uid, createdRecords: { medicines: input.medicines?.length ?? 0, procedures: input.procedures?.length ?? 0, appointments: input.appointments?.length ?? 0, milestones: input.milestones?.length ?? 0, caregivers: input.caregivers?.length ?? 0, reports: reportCount } },
       createdAt: now,
