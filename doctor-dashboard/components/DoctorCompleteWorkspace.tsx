@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Patient } from "@/types/patient";
 import type { Milestone } from "@/types/milestone";
@@ -14,6 +14,8 @@ import { replyToDoctorQuery, updateDoctorQueryStatus } from "@/lib/api/doctorQue
 import { reviewDoctorReport } from "@/lib/api/doctorReport";
 import { updateDoctorCaregiver } from "@/lib/api/doctorCaregiver";
 import type { DoctorNote } from "@/types/doctorNote";
+import type { CarePlanVersion } from "@/types/carePlanVersion";
+import type { DoctorClinicalReview } from "@/types/doctorClinicalReview";
 
 type Row = Record<string, any>;
 type WorkspaceData = {
@@ -37,6 +39,7 @@ const tabs = [
   ["reports", "Reports"],
   ["caregivers", "Caregivers"],
   ["audit", "Audit / Emergency"],
+  ["ai-review", "AI Evidence Review"],
   ["notes", "Doctor Notes"],
 ] as const;
 
@@ -48,7 +51,7 @@ function date(value?: string) {
 function patientName(patients: Patient[], id: string) {
   return patients.find((p) => p.patientId === id)?.name ?? id;
 }
-function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
+function Table({ headers, children }: { headers: string[]; children: ReactNode }) {
   return <div className="doctor-complete-table-wrap"><table className="doctor-complete-table"><thead><tr>{headers.map((h) => <th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>;
 }
 
@@ -63,6 +66,13 @@ export default function DoctorCompleteWorkspace() {
   const [message, setMessage] = useState("");
   const [reply, setReply] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState<DoctorNote[]>([]);
+  const [versions, setVersions] = useState<CarePlanVersion[]>([]);
+  const [clinicalReview, setClinicalReview] = useState<DoctorClinicalReview | null>(null);
+  const [clinicalQuestion, setClinicalQuestion] = useState("");
+  const [clinicalLoading, setClinicalLoading] = useState(false);
+  const [reportCurrentText, setReportCurrentText] = useState("");
+  const [reportPreviousText, setReportPreviousText] = useState("");
+  const [reportAnalysis, setReportAnalysis] = useState<any>(null);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
   const [saving, setSaving] = useState(false);
@@ -83,6 +93,15 @@ export default function DoctorCompleteWorkspace() {
     }
   }
 
+  async function loadVersions(patientId = selectedPatient) {
+    if (!patientId) return;
+    try {
+      const response = await authenticatedFetch("/api/doctor/care-plan-versions?patientId=" + encodeURIComponent(patientId));
+      if (!response.ok) throw new Error("Unable to load care plan versions.");
+      setVersions((await response.json()).data as CarePlanVersion[]);
+    } catch (e) { setError(e instanceof Error ? e.message : "Unable to load care plan versions."); }
+  }
+
   async function loadNotes(patientId = selectedPatient) {
     if (!patientId) return;
     try {
@@ -95,7 +114,7 @@ export default function DoctorCompleteWorkspace() {
   }
 
   useEffect(() => { void load(); }, []);
-  useEffect(() => { if (activeTab === "notes") void loadNotes(); }, [activeTab, selectedPatient]);
+  useEffect(() => { if (activeTab === "notes") void loadNotes(); if (activeTab === "care-plans") void loadVersions(); }, [activeTab, selectedPatient]);
 
   function go(tab: string) {
     router.push("/doctor/workspace?tab=" + encodeURIComponent(tab), { scroll: false });
@@ -109,6 +128,7 @@ export default function DoctorCompleteWorkspace() {
       setMessage(success);
       await load();
       if (activeTab === "notes") await loadNotes();
+      if (activeTab === "care-plans") await loadVersions();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Action failed.");
     } finally {
@@ -168,7 +188,7 @@ export default function DoctorCompleteWorkspace() {
           <h3>Add procedure</h3><input value={procedure.name} onChange={(e) => setProcedure({ ...procedure, name: e.target.value })} placeholder="Procedure" required/><input type="date" value={procedure.date} onChange={(e) => setProcedure({ ...procedure, date: e.target.value })} required/><input value={procedure.purpose} onChange={(e) => setProcedure({ ...procedure, purpose: e.target.value })} placeholder="Purpose"/><textarea value={procedure.details} onChange={(e) => setProcedure({ ...procedure, details: e.target.value })} placeholder="Details"/><button disabled={saving}>Add procedure</button>
         </form>
       </div>}
-      <Table headers={["Patient","Type","Item","Detail","Date","Status"]}>{careRows.map((x) => <tr key={x.type + x.id}><td>{patientName(data.patients, x.patientId)}</td><td>{x.type}</td><td>{x.name}</td><td>{x.detail}</td><td>{date(x.date)}</td><td><select value={x.status} onChange={(e) => { if (x.type === "Milestone") void run(() => updateDoctorMilestone({ milestoneId: x.id, status: e.target.value as Milestone["status"] }), "Milestone updated."); else if (x.type === "Medicine") void run(() => updateDoctorMedicine({ medicineId: x.id, status: e.target.value as Medicine["status"] }), "Medicine updated."); else void run(() => updateDoctorProcedure({ procedureId: x.id, status: e.target.value as Procedure["status"] }), "Procedure updated."); }}><option value="pending">Pending</option><option value="active">Active</option><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="overdue">Overdue</option><option value="cancelled">Cancelled</option></select></td></tr>)}</Table>
+      <Table headers={["Patient","Type","Item","Detail","Date","Status"]}>{careRows.map((x) => <tr key={x.type + x.id}><td>{patientName(data.patients, x.patientId)}</td><td>{x.type}</td><td>{x.name}</td><td>{x.detail}</td><td>{date(x.date)}</td><td><select value={x.status} onChange={(e) => { if (x.type === "Milestone") void run(() => updateDoctorMilestone({ milestoneId: x.id, status: e.target.value as Milestone["status"] }), "Milestone updated."); else if (x.type === "Medicine") void run(() => updateDoctorMedicine({ medicineId: x.id, status: e.target.value as Medicine["status"] }), "Medicine updated."); else void run(() => updateDoctorProcedure({ procedureId: x.id, status: e.target.value as Procedure["status"] }), "Procedure updated."); }}><option value="pending">Pending</option><option value="active">Active</option><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="overdue">Overdue</option><option value="cancelled">Cancelled</option></select></td></tr>)}</Table>\n      {selectedPatient && <div className="doctor-complete-version-box"><div><strong>Care plan versions</strong><span>Snapshots preserve the existing live care-plan records without replacing them.</span></div><button disabled={saving} onClick={() => void run(async () => { const r = await authenticatedFetch("/api/doctor/care-plan-versions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ patientId: selectedPatient }) }); if (!r.ok) throw new Error("Unable to create care plan version."); }, "Care plan version saved.")}>Save version</button><div>{versions.map((v) => <span className="doctor-version-pill" key={v.versionId}>v{v.version} · {date(v.createdAt)} · {v.summary.milestones} milestones · {v.summary.activeMedicines} active medicines</span>)}</div></div>}
     </section>}
 
     {activeTab === "appointments" && <section className="doctor-card">
@@ -184,7 +204,7 @@ export default function DoctorCompleteWorkspace() {
 
     {activeTab === "reports" && <section className="doctor-card">
       <div className="doctor-card-heading"><div><span className="doctor-eyebrow">CLINICAL DOCUMENTS</span><h2>Reports review</h2><p className="doctor-muted-text">View the stored report and record a clinician review. No AI interpretation is inferred from metadata alone.</p></div></div>
-      <Table headers={["Patient","Report","Type","Uploaded","Status","Action"]}>{data.reports.map((r) => <tr key={r.reportId}><td>{patientName(data.patients, r.patientId)}</td><td><strong>{r.title}</strong><span>{r.fileName}</span></td><td>{r.reportType ?? "Record"}</td><td>{date(r.uploadedAt)}</td><td>{r.status}</td><td><button onClick={async () => { const response = await authenticatedFetch("/api/doctor/reports/" + encodeURIComponent(r.reportId) + "/access"); if (response.ok) { const body = await response.json(); window.open(body.url, "_blank", "noopener,noreferrer"); } }}>View</button>{r.status !== "reviewed" && <button onClick={() => void run(() => reviewDoctorReport({ reportId: r.reportId, notes: "Reviewed in Complete Doctor Workspace." }), "Report marked reviewed; patient record is synchronized.")}>Review</button>}</td></tr>)}</Table>
+      <Table headers={["Patient","Report","Type","Uploaded","Status","Action"]}>{data.reports.map((r) => <tr key={r.reportId}><td>{patientName(data.patients, r.patientId)}</td><td><strong>{r.title}</strong><span>{r.fileName}</span></td><td>{r.reportType ?? "Record"}</td><td>{date(r.uploadedAt)}</td><td>{r.status}</td><td><button onClick={async () => { const response = await authenticatedFetch("/api/doctor/reports/" + encodeURIComponent(r.reportId) + "/access"); if (response.ok) { const body = await response.json(); window.open(body.url, "_blank", "noopener,noreferrer"); } }}>View</button>{r.status !== "reviewed" && <button onClick={() => void run(() => reviewDoctorReport({ reportId: r.reportId, notes: "Reviewed in Complete Doctor Workspace." }), "Report marked reviewed; patient record is synchronized.")}>Review</button>}</td></tr>)}</Table>\n      <div className="doctor-report-assistant"><h3>Document comparison assistant</h3><p className="doctor-muted-text">Paste extracted report text when available. The assistant compares text only and does not infer a diagnosis or treatment.</p><textarea value={reportCurrentText} onChange={(e) => setReportCurrentText(e.target.value)} placeholder="Current report text" rows={7}/><textarea value={reportPreviousText} onChange={(e) => setReportPreviousText(e.target.value)} placeholder="Previous report text (optional)" rows={7}/><button disabled={!reportCurrentText.trim() || saving} onClick={() => void run(async () => { const r = await authenticatedFetch("/api/doctor/report-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ currentText: reportCurrentText, previousText: reportPreviousText }) }); if (!r.ok) throw new Error((await r.json()).error ?? "Unable to compare reports."); setReportAnalysis((await r.json()).data); }, "Report comparison generated.")}>Compare supplied text</button>{reportAnalysis && <div className="doctor-report-result"><strong>{reportAnalysis.summary}</strong><h4>Documented changes</h4><ul>{reportAnalysis.changes.map((x: string, i: number) => <li key={i}>{x}</li>)}</ul><h4>Unchanged</h4><ul>{reportAnalysis.unchanged.map((x: string, i: number) => <li key={i}>{x}</li>)}</ul><h4>Uncertainties</h4><ul>{reportAnalysis.uncertainties.map((x: string, i: number) => <li key={i}>{x}</li>)}</ul><small>{reportAnalysis.model} · {reportAnalysis.disclaimer}</small></div>}</div>
     </section>}
 
     {activeTab === "caregivers" && <section className="doctor-card">
@@ -196,6 +216,14 @@ export default function DoctorCompleteWorkspace() {
       <div className="doctor-card-heading"><div><span className="doctor-eyebrow">SAFETY + ACCOUNTABILITY</span><h2>Audit / Emergency</h2><p className="doctor-muted-text">SOS events are handled explicitly; the audit table remains the traceability record.</p></div></div>
       <h3>Emergency queue</h3><Table headers={["Patient","Status","Message","Created","Action"]}>{data.sosEvents.map((s) => <tr key={s.sosId}><td>{patientName(data.patients, s.patientId)}</td><td>{s.status}</td><td>{s.message ?? "Patient-triggered safety event"}</td><td>{date(s.createdAt)}</td><td>{s.status === "triggered" ? <><button onClick={() => void run(async () => { const r = await authenticatedFetch("/api/doctor/sos", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sosId: s.sosId, status: "acknowledged" }) }); if (!r.ok) throw new Error("Unable to acknowledge SOS."); }, "SOS acknowledged.")}>Acknowledge</button><button onClick={() => void run(async () => { const r = await authenticatedFetch("/api/doctor/sos", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sosId: s.sosId, status: "resolved" }) }); if (!r.ok) throw new Error("Unable to resolve SOS."); }, "SOS resolved.")}>Resolve</button></> : s.status === "acknowledged" ? <button onClick={() => void run(async () => { const r = await authenticatedFetch("/api/doctor/sos", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sosId: s.sosId, status: "resolved" }) }); if (!r.ok) throw new Error("Unable to resolve SOS."); }, "SOS resolved.")}>Resolve</button> : "Resolved"}</td></tr>)}</Table>
       <h3>Recent audit trail</h3><Table headers={["Time","Patient","Action","Entity","Actor"]}>{data.auditLogs.slice().sort((a,b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()).slice(0,30).map((x) => <tr key={x.auditId}><td>{date(x.createdAt)}</td><td>{patientName(data.patients, x.patientId)}</td><td>{x.action}</td><td>{x.entityType}</td><td>{x.actorRole}</td></tr>)}</Table>
+    </section>}
+
+    {activeTab === "ai-review" && <section className="doctor-card">
+      <div className="doctor-card-heading"><div><span className="doctor-eyebrow">AI EVIDENCE REVIEW</span><h2>Evidence-backed clinician review</h2><p className="doctor-muted-text">Uses the existing patient record plus retrieved medical literature. It produces evidence points and questions for clinician review; it does not diagnose, prescribe, calculate risk, or change the care plan.</p></div></div>
+      <select value={selectedPatient} onChange={(e) => { setSelectedPatient(e.target.value); setClinicalReview(null); }}><option value="">Select patient</option>{data.patients.map((p) => <option key={p.patientId} value={p.patientId}>{p.name} · {p.patientId}</option>)}</select>
+      <textarea value={clinicalQuestion} onChange={(e) => setClinicalQuestion(e.target.value)} placeholder="What would you like the evidence workspace to organize?" rows={4}/>
+      <button disabled={!selectedPatient || !clinicalQuestion.trim() || clinicalLoading} onClick={async () => { try { setClinicalLoading(true); setError(""); const r = await authenticatedFetch("/api/doctor/clinical-review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ patientId: selectedPatient, question: clinicalQuestion }) }); if (!r.ok) throw new Error((await r.json()).error ?? "Unable to generate evidence review."); setClinicalReview((await r.json()).data as DoctorClinicalReview); } catch (e) { setError(e instanceof Error ? e.message : "Unable to generate evidence review."); } finally { setClinicalLoading(false); } }}>{clinicalLoading ? "Reviewing evidence…" : "Generate evidence review"}</button>
+      {clinicalReview && <div className="doctor-clinical-review"><h3>Record context</h3><p>{clinicalReview.contextSummary}</p><h3>Evidence points</h3><ul>{clinicalReview.evidencePoints.map((x, i) => <li key={i}>{x}</li>)}</ul><h3>Considerations for clinician review</h3><ul>{clinicalReview.considerationsForReview.map((x, i) => <li key={i}>{x}</li>)}</ul><h3>Uncertainties</h3><ul>{clinicalReview.uncertainties.map((x, i) => <li key={i}>{x}</li>)}</ul><h3>Sources</h3><ul>{clinicalReview.sources.map((s, i) => <li key={i}>{s.title} {s.url && <a href={s.url} target="_blank" rel="noreferrer">Source</a>}</li>)}</ul><small>{clinicalReview.model} · {clinicalReview.disclaimer}</small></div>}
     </section>}
 
     {activeTab === "notes" && <section className="doctor-card">
@@ -231,7 +259,7 @@ export default function DoctorCompleteWorkspace() {
       .doctor-complete-thread{border:1px solid var(--onko-line);border-radius:8px;padding:12px;margin-top:10px}.doctor-complete-thread>div:first-child{display:flex;justify-content:space-between;gap:12px}.doctor-complete-thread>div:first-child span{font-size:8px;color:var(--onko-muted)}
       .doctor-complete-messages{margin:10px 0;padding:8px;background:#f7faf9;border-radius:6px}.doctor-complete-messages p{margin:5px 0;font-size:8px;line-height:1.45}
       .doctor-complete-actions{display:grid;grid-template-columns:130px 1fr auto;gap:7px}.doctor-complete-actions select{width:auto}
-      .doctor-complete-note-form{display:grid;gap:8px;max-width:720px;margin:14px 0}.doctor-complete-note-list{display:grid;gap:8px}.doctor-complete-note-list article{border:1px solid var(--onko-line);border-radius:8px;padding:11px}.doctor-complete-note-list time{float:right;font-size:7px;color:var(--onko-muted)}.doctor-complete-note-list p{white-space:pre-wrap;font-size:8px;line-height:1.55;color:#53666a}
+      .doctor-complete-note-form{display:grid;gap:8px;max-width:720px;margin:14px 0}.doctor-complete-version-box,.doctor-report-assistant,.doctor-clinical-review{border:1px solid var(--onko-line);border-radius:8px;padding:12px;margin:14px 0;display:grid;gap:8px}.doctor-complete-version-box>div:first-child{display:grid;gap:3px}.doctor-complete-version-box>div:first-child span{font-size:8px;color:var(--onko-muted)}.doctor-version-pill{display:inline-block!important;width:max-content!important;padding:5px 7px;margin:3px;border-radius:99px;background:var(--onko-teal-soft);font-size:7px!important;color:var(--onko-teal)!important}.doctor-report-result,.doctor-clinical-review{line-height:1.5}.doctor-report-result h4,.doctor-clinical-review h3{font-size:9px;margin:10px 0 3px}.doctor-report-result li,.doctor-clinical-review li{font-size:8px;margin:4px 0}.doctor-report-assistant textarea{width:100%;box-sizing:border-box}.doctor-complete-note-list{display:grid;gap:8px}.doctor-complete-note-list article{border:1px solid var(--onko-line);border-radius:8px;padding:11px}.doctor-complete-note-list time{float:right;font-size:7px;color:var(--onko-muted)}.doctor-complete-note-list p{white-space:pre-wrap;font-size:8px;line-height:1.55;color:#53666a}
       @media(max-width:900px){.doctor-complete-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.doctor-complete-head{flex-direction:column}.doctor-complete-form-grid{grid-template-columns:1fr}.doctor-complete-actions{grid-template-columns:1fr}.doctor-complete-tabs{max-width:100%}}
     `}
     </style>
