@@ -1,20 +1,21 @@
 "use client";
+import type {ReactNode} from "react";
 import {useEffect,useMemo,useState} from "react";
 import type {Patient} from "@/types/patient";import type {Appointment} from "@/types/appointment";import type {DoctorNote} from "@/types/doctorNote";
 import {authenticatedFetch} from "@/lib/api/authenticatedFetch";import {createDoctorAppointment,updateDoctorAppointment} from "@/lib/api/doctorAppointments";import {createDoctorNote,fetchDoctorNotes} from "@/lib/api/doctorNotes";
 type Row=Record<string,any>;type Data={patients:Patient[];appointments:Appointment[];medicines:Row[];procedures:Row[];reports:Row[];queries:Row[];milestones:Row[];caregivers:Row[];sosEvents:Row[];auditLogs:Row[]};
 function date(v?:string){if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?v:new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(d);}
 function name(ps:Patient[],id:string){return ps.find(p=>p.patientId===id)?.name??id;}
-function Table({children,headers}:{children:React.ReactNode;headers:string[]}){return <div className="doctor-workspace-table-wrap"><table className="doctor-workspace-table"><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>}
+function Table({children,headers}:{children:ReactNode;headers:string[]}){return <div className="doctor-workspace-table-wrap"><table className="doctor-workspace-table"><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>}
 export default function DoctorOperationsWorkspace({mode}:{mode:"progress"|"appointments"|"care-plans"|"notes"}){
  const[data,setData]=useState<Data|null>(null);const[error,setError]=useState("");const[loading,setLoading]=useState(true);const[patientId,setPatientId]=useState("");const[notes,setNotes]=useState<DoctorNote[]>([]);
  const[form,setForm]=useState({title:"",date:"",time:"",location:"",instructions:""});const[noteForm,setNoteForm]=useState({patientId:"",title:"",content:""});
  async function load(){try{setLoading(true);const r=await authenticatedFetch("/api/doctor/workspace");if(!r.ok)throw new Error("Workspace request failed.");const d=(await r.json()).data as Data;setData(d);if(mode==="notes")setNotes(await fetchDoctorNotes());}catch(e){setError(e instanceof Error?e.message:"Unable to load workspace.")}finally{setLoading(false)}}
  useEffect(()=>{void load()},[mode]);
- const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata"}).format(new Date());
+
  const progress=useMemo(()=>{if(!data)return[];return data.patients.map(p=>{const ms=data.milestones.filter(x=>x.patientId===p.patientId&&x.status!=="cancelled");const done=ms.filter(x=>x.status==="completed").length;const ap=data.appointments.filter(x=>x.patientId===p.patientId);const missed=ap.filter(x=>x.status==="missed").length;const openQ=data.queries.filter(x=>x.patientId===p.patientId&&x.status==="open").length;return {...p,milestones:ms.length,completed:done,missedAppointments:missed,openQueries:openQ,calculatedProgress:ms.length?Math.round(done/ms.length*100):p.journeyProgress}})},[data]);
  const appts=useMemo(()=>data?.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))??[],[data]);
- async function schedule(e:React.FormEvent){e.preventDefault();if(!patientId||!form.title||!form.date||!form.time)return;try{await createDoctorAppointment({patientId,doctorId:data?.appointments[0]?.doctorId??"",...form,status:"scheduled"});setForm({title:"",date:"",time:"",location:"",instructions:""});await load()}catch(e){setError(e instanceof Error?e.message:"Unable to schedule appointment.")}}
+ async function schedule(e:React.FormEvent){e.preventDefault();if(!patientId||!form.title||!form.date||!form.time)return;try{await createDoctorAppointment({patientId,doctorId:data?.patients.find(p=>p.patientId===patientId)?.doctorId??"",...form,status:"scheduled"});setForm({title:"",date:"",time:"",location:"",instructions:""});await load()}catch(e){setError(e instanceof Error?e.message:"Unable to schedule appointment.")}}
  async function updateAppointment(a:Appointment,status:Appointment["status"]){try{await updateDoctorAppointment({appointmentId:a.appointmentId,status});await load()}catch(e){setError(e instanceof Error?e.message:"Unable to update appointment.")}}
  async function saveNote(e:React.FormEvent){e.preventDefault();if(!noteForm.patientId||!noteForm.title||!noteForm.content)return;try{await createDoctorNote(noteForm);setNoteForm({patientId:"",title:"",content:""});setNotes(await fetchDoctorNotes())}catch(e){setError(e instanceof Error?e.message:"Unable to save note.")}}
  if(loading)return <main className="doctor-page"><div className="doctor-card doctor-directory-state">Loading {mode}…</div></main>;
