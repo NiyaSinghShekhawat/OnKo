@@ -1,0 +1,1 @@
+import {authenticatedFetch} from "./authenticatedFetch";export async function updateDoctorTriage(queryId:string,action:"escalate"|"clear-escalation"){const r=await authenticatedFetch("/api/doctor/queries/triage",{method:"PATCH",body:JSON.stringify({queryId,action})});if(!r.ok)throw new Error("Unable to update query triage.");return(await r.json()).data;}
