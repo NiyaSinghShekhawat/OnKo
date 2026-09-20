@@ -5,26 +5,12 @@ import { authenticatedFetch } from "@/lib/api/authenticatedFetch";
 import type { Patient } from "@/types/patient";
 
 type Row = Record<string, any>;
-type WorkspaceData = {
-  patients: Patient[];
-  appointments: Row[];
-  medicines: Row[];
-  procedures: Row[];
-  reports: Row[];
-  queries: Row[];
-  milestones: Row[];
-  caregivers: Row[];
-  sosEvents: Row[];
-  auditLogs: Row[];
-};
+type WorkspaceData = { patients: Patient[]; appointments: Row[]; medicines: Row[]; procedures: Row[]; reports: Row[]; queries: Row[]; milestones: Row[]; caregivers: Row[]; sosEvents: Row[]; auditLogs: Row[] };
 
 const phase: Record<string, string> = {
-  "active-treatment": "Active treatment",
-  "remission-survivorship": "Remission / survivorship",
-  relapse: "Relapse",
-  "transfer-of-care": "Transfer of care",
-  "palliative-end-of-life": "Palliative / end-of-life",
-  deceased: "Deceased",
+  "active-treatment": "Active treatment", "remission-survivorship": "Remission / survivorship",
+  relapse: "Relapse", "transfer-of-care": "Transfer of care",
+  "palliative-end-of-life": "Palliative / end-of-life", deceased: "Deceased",
 };
 
 function date(value?: string) {
@@ -32,36 +18,13 @@ function date(value?: string) {
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? value : new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(d);
 }
-
-function patientName(patients: Patient[], id: string) {
-  return patients.find((p) => p.patientId === id)?.name ?? id;
-}
+function patientName(patients: Patient[], id: string) { return patients.find((p) => p.patientId === id)?.name ?? id; }
 
 function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
-  return (
-    <div className="doctor-workspace-table-wrap">
-      <table className="doctor-workspace-table">
-        <thead><tr>{headers.map((h) => <th key={h}>{h}</th>)}</tr></thead>
-        <tbody>{children}</tbody>
-      </table>
-    </div>
-  );
+  return <div className="doctor-workspace-table-wrap"><table className="doctor-workspace-table"><thead><tr>{headers.map((h) => <th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>;
 }
-
 function Section({ id, eyebrow, title, description, children, count }: { id: string; eyebrow: string; title: string; description: string; children: React.ReactNode; count?: number }) {
-  return (
-    <section id={id} className="doctor-card doctor-workspace-section">
-      <div className="doctor-workspace-section-heading">
-        <div>
-          <span className="doctor-eyebrow">{eyebrow}</span>
-          <h2>{title}</h2>
-          <p>{description}</p>
-        </div>
-        {count !== undefined && <span className="doctor-neutral-pill">{count} records</span>}
-      </div>
-      {children}
-    </section>
-  );
+  return <section id={id} className="doctor-card doctor-workspace-section"><div className="doctor-workspace-section-heading"><div><span className="doctor-eyebrow">{eyebrow}</span><h2>{title}</h2><p>{description}</p></div>{count !== undefined && <span className="doctor-neutral-pill">{count} records</span>}</div>{children}</section>;
 }
 
 export default function DoctorWorkspaceTables() {
@@ -77,42 +40,31 @@ export default function DoctorWorkspaceTables() {
     try {
       const response = await authenticatedFetch("/api/doctor/workspace");
       if (!response.ok) throw new Error("Workspace request failed.");
-      setData((await response.json()).data);
-      setError("");
-    } catch (e) {
-      console.error(e);
-      setError("Unable to load workspace tables.");
-    } finally {
-      setLoading(false);
-    }
+      setData((await response.json()).data); setError("");
+    } catch (e) { console.error(e); setError("Unable to load workspace tables."); }
+    finally { setLoading(false); }
   }
-
   useEffect(() => { void load(); }, []);
 
   async function updateQuery(queryId: string, status: string) {
     try {
       const response = await authenticatedFetch("/api/doctor/queries", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ queryId, status }) });
       if (!response.ok) throw new Error("Query update failed.");
-      setMessage("Query status updated.");
-      await load();
+      setMessage("Query status updated."); await load();
     } catch { setMessage("Unable to update query."); }
   }
-
   async function updateReport(reportId: string) {
     try {
       const response = await authenticatedFetch("/api/doctor/reports", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reportId, notes: "Reviewed in Doctor Command Center." }) });
       if (!response.ok) throw new Error("Report review failed.");
-      setMessage("Report marked reviewed.");
-      await load();
+      setMessage("Report marked reviewed."); await load();
     } catch { setMessage("Unable to review report."); }
   }
-
   async function updateSOS(sosId: string, status: "acknowledged" | "resolved") {
     try {
       const response = await authenticatedFetch("/api/doctor/sos", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sosId, status }) });
       if (!response.ok) throw new Error("SOS update failed.");
-      setMessage(`SOS ${status}.`);
-      await load();
+      setMessage(`SOS ${status}.`); await load();
     } catch { setMessage("Unable to update SOS event."); }
   }
 
@@ -131,63 +83,80 @@ export default function DoctorWorkspaceTables() {
   if (error || !data) return <section className="doctor-page"><div className="doctor-card doctor-directory-state doctor-directory-error">{error || "No workspace data."}</div></section>;
 
   return (
-    <section className="doctor-page doctor-workspace-tables">
-      {message && <div className="doctor-workspace-toast">{message}</div>}
+    <>
+      <section className="doctor-page doctor-workspace-tables">
+        {message && <div className="doctor-workspace-toast">{message}</div>}
 
-      <Section id="patients" eyebrow="Cohort comparison" title="Patient Management" description="Compare your assigned patients side-by-side by care phase, journey progress and diagnosis." count={data.patients.length}>
-        <Table headers={["Patient", "Age", "Diagnosis / care", "Phase", "Journey", "Updated"]}>
-          {data.patients.map((p) => (
-            <tr key={p.patientId}>
-              <td><strong>{p.name}</strong><span>{p.patientId}</span></td>
-              <td>{p.age ?? "—"}</td>
-              <td>{p.diagnosisLabel ?? "—"}</td>
-              <td><span className="doctor-table-pill">{phase[p.currentCarePhase] ?? p.currentCarePhase}</span></td>
-              <td><div className="doctor-table-progress"><i style={{ width: `${Math.max(0, Math.min(100, p.journeyProgress))}%` }} /><span>{p.journeyProgress}%</span></div></td>
-              <td>{date(p.lastUpdatedAt)}</td>
-            </tr>
-          ))}
-        </Table>
-      </Section>
+        <Section id="patients" eyebrow="Cohort comparison" title="Patient Management" description="Compare assigned patients side-by-side by care phase, journey progress and diagnosis." count={data.patients.length}>
+          <Table headers={["Patient", "Age", "Diagnosis / care", "Phase", "Journey", "Updated"]}>
+            {data.patients.map((p) => <tr key={p.patientId}><td><strong>{p.name}</strong><span>{p.patientId}</span></td><td>{p.age ?? "—"}</td><td>{p.diagnosisLabel ?? "—"}</td><td><span className="doctor-table-pill">{phase[p.currentCarePhase] ?? p.currentCarePhase}</span></td><td><div className="doctor-table-progress"><i style={{ width: `${Math.max(0, Math.min(100, p.journeyProgress))}%` }} /><span>{p.journeyProgress}%</span></div></td><td>{date(p.lastUpdatedAt)}</td></tr>)}
+          </Table>
+        </Section>
 
-      <Section id="queries" eyebrow="Communication queue" title="Queries / Triage" description="Review patient questions and move conversations through open, answered and resolved states." count={queries.length}>
-        <div className="doctor-workspace-filter"><select value={queryFilter} onChange={(e) => setQueryFilter(e.target.value)}><option value="all">All statuses</option><option value="open">Open</option><option value="answered">Answered</option><option value="resolved">Resolved</option></select></div>
-        <Table headers={["Patient", "Subject", "Latest message", "Updated", "Status", "Action"]}>
-          {queries.map((q) => {
-            const last = q.messages?.[q.messages.length - 1];
-            return <tr key={q.queryId}><td><strong>{patientName(data.patients, q.patientId)}</strong><span>{q.patientId}</span></td><td>{q.subject}</td><td className="doctor-table-message">{last?.message ?? "—"}</td><td>{date(q.updatedAt)}</td><td><span className="doctor-table-pill">{q.status}</span></td><td><select value={q.status} onChange={(e) => void updateQuery(q.queryId, e.target.value)}><option value="open">Open</option><option value="answered">Answered</option><option value="resolved">Resolved</option></select></td></tr>;
-          })}
-        </Table>
-      </Section>
+        <Section id="queries" eyebrow="Communication queue" title="Queries / Triage" description="Review patient questions and move conversations through open, answered and resolved states." count={queries.length}>
+          <div className="doctor-workspace-filter"><select value={queryFilter} onChange={(e) => setQueryFilter(e.target.value)}><option value="all">All statuses</option><option value="open">Open</option><option value="answered">Answered</option><option value="resolved">Resolved</option></select></div>
+          <Table headers={["Patient", "Subject", "Latest message", "Updated", "Status", "Action"]}>
+            {queries.map((q) => { const last = q.messages?.[q.messages.length - 1]; return <tr key={q.queryId}><td><strong>{patientName(data.patients, q.patientId)}</strong><span>{q.patientId}</span></td><td>{q.subject}</td><td className="doctor-table-message">{last?.message ?? "—"}</td><td>{date(q.updatedAt)}</td><td><span className="doctor-table-pill">{q.status}</span></td><td><select value={q.status} onChange={(e) => void updateQuery(q.queryId, e.target.value)}><option value="open">Open</option><option value="answered">Answered</option><option value="resolved">Resolved</option></select></td></tr>; })}
+          </Table>
+        </Section>
 
-      <Section id="reports" eyebrow="Clinical documents" title="Reports" description="Track uploaded reports across the cohort and mark documents as reviewed by the care team." count={data.reports.length}>
-        <Table headers={["Patient", "Report", "Type", "Uploaded", "Status", "Action"]}>
-          {data.reports.map((r) => <tr key={r.reportId}><td><strong>{patientName(data.patients, r.patientId)}</strong><span>{r.patientId}</span></td><td>{r.title}</td><td>{r.reportType ?? "—"}</td><td>{date(r.uploadedAt)}</td><td><span className="doctor-table-pill">{r.status}</span></td><td>{r.status === "reviewed" ? <span className="doctor-table-ok">Reviewed</span> : <button className="doctor-table-action" onClick={() => void updateReport(r.reportId)}>Mark reviewed</button>}</td></tr>)}
-        </Table>
-      </Section>
+        <Section id="reports" eyebrow="Clinical documents" title="Reports" description="Track uploaded reports across the cohort and mark documents as reviewed by the care team." count={data.reports.length}>
+          <Table headers={["Patient", "Report", "Type", "Uploaded", "Status", "Action"]}>
+            {data.reports.map((r) => <tr key={r.reportId}><td><strong>{patientName(data.patients, r.patientId)}</strong><span>{r.patientId}</span></td><td>{r.title}</td><td>{r.reportType ?? "—"}</td><td>{date(r.uploadedAt)}</td><td><span className="doctor-table-pill">{r.status}</span></td><td>{r.status === "reviewed" ? <span className="doctor-table-ok">Reviewed</span> : <button className="doctor-table-action" onClick={() => void updateReport(r.reportId)}>Mark reviewed</button>}</td></tr>)}
+          </Table>
+        </Section>
 
-      <Section id="care-plans" eyebrow="Treatment operations" title="Care Plans" description="Unified view of milestones, medicines and procedures so the doctor can compare active care work across patients." count={carePlanRows.length}>
-        <div className="doctor-workspace-filter"><select value={carePlanFilter} onChange={(e) => setCarePlanFilter(e.target.value)}><option value="all">All care items</option><option value="milestone">Milestones</option><option value="medicine">Medicines</option><option value="procedure">Procedures</option></select></div>
-        <Table headers={["Patient", "Type", "Care item", "Detail", "Date", "Status"]}>
-          {carePlanRows.map((x, i) => <tr key={`${x.type}-${x.patientId}-${x.name}-${i}`}><td><strong>{patientName(data.patients, x.patientId)}</strong></td><td>{x.type}</td><td>{x.name}</td><td>{x.detail}</td><td>{date(x.date)}</td><td><span className="doctor-table-pill">{x.status}</span></td></tr>)}
-        </Table>
-      </Section>
+        <Section id="care-plans" eyebrow="Treatment operations" title="Care Plans" description="Unified view of milestones, medicines and procedures across the patient cohort." count={carePlanRows.length}>
+          <div className="doctor-workspace-filter"><select value={carePlanFilter} onChange={(e) => setCarePlanFilter(e.target.value)}><option value="all">All care items</option><option value="milestone">Milestones</option><option value="medicine">Medicines</option><option value="procedure">Procedures</option></select></div>
+          <Table headers={["Patient", "Type", "Care item", "Detail", "Date", "Status"]}>
+            {carePlanRows.map((x, i) => <tr key={`${x.type}-${x.patientId}-${x.name}-${i}`}><td><strong>{patientName(data.patients, x.patientId)}</strong></td><td>{x.type}</td><td>{x.name}</td><td>{x.detail}</td><td>{date(x.date)}</td><td><span className="doctor-table-pill">{x.status}</span></td></tr>)}
+          </Table>
+        </Section>
 
-      <Section id="caregivers" eyebrow="Support network" title="Caregivers" description="Compare caregiver access and permissions for patients in the assigned cohort." count={data.caregivers.length}>
-        <Table headers={["Patient", "Caregiver", "Relationship", "Contact", "Access", "Permissions"]}>
-          {data.caregivers.map((c) => <tr key={c.caregiverId}><td>{patientName(data.patients, c.patientId)}</td><td><strong>{c.name}</strong></td><td>{c.relationship}</td><td>{c.contact ?? "—"}</td><td><span className="doctor-table-pill">{c.accessStatus}</span></td><td>{Array.isArray(c.permissions) ? c.permissions.join(", ") : "—"}</td></tr>)}
-        </Table>
-      </Section>
+        <Section id="caregivers" eyebrow="Support network" title="Caregivers" description="Compare caregiver access and permissions for patients in the assigned cohort." count={data.caregivers.length}>
+          <Table headers={["Patient", "Caregiver", "Relationship", "Contact", "Access", "Permissions"]}>
+            {data.caregivers.map((c) => <tr key={c.caregiverId}><td>{patientName(data.patients, c.patientId)}</td><td><strong>{c.name}</strong></td><td>{c.relationship}</td><td>{c.contact ?? "—"}</td><td><span className="doctor-table-pill">{c.accessStatus}</span></td><td>{Array.isArray(c.permissions) ? c.permissions.join(", ") : "—"}</td></tr>)}
+          </Table>
+        </Section>
 
-      <Section id="audit" eyebrow="Safety & accountability" title="Audit / Emergency" description="Safety events and key workflow actions are visible together for rapid review and traceability." count={data.sosEvents.length + data.auditLogs.length}>
-        <div className="doctor-subsection-title">Emergency / SOS queue</div>
-        <Table headers={["Patient", "Status", "Message", "Triggered", "Action"]}>
-          {data.sosEvents.length ? data.sosEvents.map((s) => <tr key={s.sosId}><td><strong>{patientName(data.patients, s.patientId)}</strong><span>{s.patientId}</span></td><td><span className="doctor-table-pill doctor-table-pill-alert">{s.status}</span></td><td>{s.message ?? "Patient-triggered safety event"}</td><td>{date(s.createdAt)}</td><td>{s.status === "triggered" ? <><button className="doctor-table-action" onClick={() => void updateSOS(s.sosId, "acknowledged")}>Acknowledge</button>{" "}<button className="doctor-table-action" onClick={() => void updateSOS(s.sosId, "resolved")}>Resolve</button></> : s.status === "acknowledged" ? <button className="doctor-table-action" onClick={() => void updateSOS(s.sosId, "resolved")}>Resolve</button> : <span className="doctor-table-ok">Resolved</span>}</td></tr>) : <tr><td colSpan={5}>No SOS events.</td></tr>}
-        </Table>
-        <div className="doctor-subsection-title">Recent audit trail</div>
-        <Table headers={["Time", "Patient", "Action", "Entity", "Actor"]}>
-          {data.auditLogs.slice().sort((a,b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()).slice(0, 20).map((log, i) => <tr key={log.auditId ?? i}><td>{date(log.createdAt)}</td><td>{patientName(data.patients, log.patientId)}</td><td>{log.action}</td><td>{log.entityType}</td><td>{log.actorRole}</td></tr>)}
-        </Table>
-      </Section>
-    </section>
+        <Section id="audit" eyebrow="Safety & accountability" title="Audit / Emergency" description="Safety events and key workflow actions are visible together for rapid review and traceability." count={data.sosEvents.length + data.auditLogs.length}>
+          <div className="doctor-subsection-title">Emergency / SOS queue</div>
+          <Table headers={["Patient", "Status", "Message", "Triggered", "Action"]}>
+            {data.sosEvents.length ? data.sosEvents.map((s) => <tr key={s.sosId}><td><strong>{patientName(data.patients, s.patientId)}</strong><span>{s.patientId}</span></td><td><span className="doctor-table-pill doctor-table-pill-alert">{s.status}</span></td><td>{s.message ?? "Patient-triggered safety event"}</td><td>{date(s.createdAt)}</td><td>{s.status === "triggered" ? <><button className="doctor-table-action" onClick={() => void updateSOS(s.sosId, "acknowledged")}>Acknowledge</button>{" "}<button className="doctor-table-action" onClick={() => void updateSOS(s.sosId, "resolved")}>Resolve</button></> : s.status === "acknowledged" ? <button className="doctor-table-action" onClick={() => void updateSOS(s.sosId, "resolved")}>Resolve</button> : <span className="doctor-table-ok">Resolved</span>}</td></tr>) : <tr><td colSpan={5}>No SOS events.</td></tr>}
+          </Table>
+          <div className="doctor-subsection-title">Recent audit trail</div>
+          <Table headers={["Time", "Patient", "Action", "Entity", "Actor"]}>
+            {data.auditLogs.slice().sort((a,b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()).slice(0, 20).map((log, i) => <tr key={log.auditId ?? i}><td>{date(log.createdAt)}</td><td>{patientName(data.patients, log.patientId)}</td><td>{log.action}</td><td>{log.entityType}</td><td>{log.actorRole}</td></tr>)}
+          </Table>
+        </Section>
+      </section>
+      <style jsx global>{`
+        .doctor-workspace-tables{padding-top:0}
+        .doctor-workspace-section{scroll-margin-top:100px}
+        .doctor-workspace-section-heading{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}
+        .doctor-workspace-section-heading h2{margin:6px 0 4px;font-size:16px}
+        .doctor-workspace-section-heading p{margin:0;color:var(--onko-muted);font-size:9px;line-height:1.5}
+        .doctor-workspace-table-wrap{overflow-x:auto}
+        .doctor-workspace-table{width:100%;min-width:760px;border-collapse:collapse}
+        .doctor-workspace-table th{padding:9px 10px;text-align:left;border-bottom:1px solid var(--onko-line);color:var(--onko-muted);font-size:7px;text-transform:uppercase;letter-spacing:.06em}
+        .doctor-workspace-table td{padding:10px;border-bottom:1px solid #edf1f1;color:#53666a;font-size:8px;vertical-align:middle}
+        .doctor-workspace-table td strong,.doctor-workspace-table td span{display:block}
+        .doctor-workspace-table td span{margin-top:3px;color:var(--onko-muted);font-size:7px}
+        .doctor-table-pill{display:inline-flex!important;width:max-content;padding:4px 7px;border-radius:99px;background:var(--onko-teal-soft);color:var(--onko-teal)!important;font-weight:700}
+        .doctor-table-pill-alert{background:#fff0f1;color:var(--onko-red)!important}
+        .doctor-table-progress{display:flex;align-items:center;gap:7px;min-width:90px}
+        .doctor-table-progress i{display:block;width:60px;height:5px;border-radius:99px;background:var(--onko-teal)}
+        .doctor-table-progress span{margin:0!important}
+        .doctor-table-message{max-width:260px}
+        .doctor-workspace-filter{display:flex;justify-content:flex-end;margin-bottom:10px}
+        .doctor-workspace-filter select,.doctor-workspace-table select{min-height:28px;border:1px solid var(--onko-line);border-radius:6px;background:#fff;padding:5px 7px;color:var(--onko-ink);font-size:8px}
+        .doctor-table-action{border:1px solid var(--onko-teal);border-radius:6px;background:#fff;color:var(--onko-teal);padding:6px 8px;font-size:7px;font-weight:700;cursor:pointer}
+        .doctor-table-action:hover{background:var(--onko-teal-soft)}
+        .doctor-table-ok{color:#2f6e57!important;font-weight:700}
+        .doctor-subsection-title{margin:15px 0 8px;font-size:9px;font-weight:800;color:var(--onko-ink);text-transform:uppercase;letter-spacing:.05em}
+        .doctor-workspace-toast{position:sticky;top:10px;z-index:3;padding:8px 10px;border:1px solid #d5e5e6;border-radius:7px;background:var(--onko-teal-soft);color:var(--onko-teal);font-size:8px;font-weight:700}
+        @media(max-width:700px){.doctor-workspace-section-heading{flex-direction:column}.doctor-workspace-table{min-width:680px}}
+      `}</style>
+    </>
   );
 }
