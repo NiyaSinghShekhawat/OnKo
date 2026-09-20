@@ -1,6 +1,4 @@
-import {NextRequest,NextResponse} from "next/server";
-import {requirePatient} from "@/backend/api/auth";
-import {listCaregiversForPatient,updateCaregiverForPatient} from "@/backend/services/patientCaregiverService";
+import {NextRequest,NextResponse} from "next/server";import {requirePatient} from "@/backend/api/auth";import {listCaregiversForPatient,updateCaregiverForPatient} from "@/backend/services/patientCaregiverService";
 import {getPatient} from "@/backend/services/patientService";
 import {createDoctorNotification} from "@/backend/services/doctorNotificationService";
 export async function GET(request:NextRequest){const a=await requirePatient(request);if("error"in a)return a.error;try{return NextResponse.json({data:await listCaregiversForPatient(a.patientId)})}catch(e){console.error(e);return NextResponse.json({error:"Unable to load caregiver invitations."},{status:500})}}
