@@ -9,6 +9,7 @@ import DoctorHeader from "@/doctor-dashboard/components/DoctorHeader";
 import DoctorOverviewFoundation from "@/doctor-dashboard/components/DoctorOverviewFoundation";
 import DoctorPatientManagement from "@/doctor-dashboard/components/DoctorPatientManagement";
 import DoctorPatient360 from "@/doctor-dashboard/components/DoctorPatient360";
+import DoctorWorkspaceTables from "@/doctor-dashboard/components/DoctorWorkspaceTables";
 
 export default function DoctorPage() {
   const router = useRouter();
@@ -67,6 +68,7 @@ export default function DoctorPage() {
           <>
             <DoctorOverviewFoundation />
             <DoctorPatientManagement onOpenPatient={setPatientId} />
+            <DoctorWorkspaceTables />
           </>
         )}
       </main>
