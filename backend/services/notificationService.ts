@@ -5,7 +5,8 @@ export async function createPatientNotification(input:{patientId:string;type:Not
   const channel=input.channel||"in-app";
   const notification:Notification={
     notificationId:"notif-"+crypto.randomUUID(),patientId:input.patientId,type:input.type,title:input.title,message:input.message,
-    createdAt:new Date().toISOString(),channel,status:channel==="in-app"?"sent":"pending",metadata:input.metadata
+    createdAt:new Date().toISOString(),channel,status:channel==="in-app"?"sent":"pending",
+    ...(input.metadata ? { metadata: input.metadata } : {})
   };
   await createDocument("notifications",notification);
   return notification;
@@ -23,6 +24,6 @@ export async function markPatientNotificationRead(notificationId:string,patientI
 export async function updateNotificationDeliveryStatus(notificationId:string,status:Notification["status"]){
   const ref=documentRef<Notification>("notifications",notificationId);const snap=await ref.get();
   if(!snap.exists)throw new Error("Notification not found.");
-  await ref.update({status,...(status==="read"?{readAt:new Date().toISOString()}:{})});
+  await ref.update({status,...(status==="read"?{readAt:new Date().toISOString()}: {})});
   return {...(snap.data() as Notification),status};
 }
