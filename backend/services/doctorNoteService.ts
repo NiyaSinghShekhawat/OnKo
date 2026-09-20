@@ -21,7 +21,7 @@ export async function createDoctorNote(input: { doctorId: string; patientId: str
     updatedAt: now,
   };
   if (!note.title || !note.body) throw new Error("Title and body are required.");
-  await createDocument("doctorNotes", note);
+  await setDocument("doctorNotes", note.noteId, note);
   return note;
 }
 
