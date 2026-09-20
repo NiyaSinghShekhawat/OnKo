@@ -34,10 +34,17 @@ export default function PatientOnboarding() {
   const submit = async () => {
     setSaving(true); setError(""); setResult(null);
     try {
-      const payload = { ...input, reports: input.reports.map((report, i) => ({ ...report, fileIndex: reportFiles[i] ? i : undefined })) };
+      const uploadedFiles: File[] = [];
+      const reports = input.reports.map((report, i) => {
+        const file = reportFiles[i];
+        if (!file) return { ...report, fileIndex: undefined };
+        const fileIndex = uploadedFiles.push(file) - 1;
+        return { ...report, fileIndex };
+      });
+      const payload = { ...input, reports };
       const form = new FormData();
       form.set("payload", JSON.stringify(payload));
-      reportFiles.forEach((file) => form.append("reports", file));
+      uploadedFiles.forEach((file) => form.append("reports", file));
       const response = await authenticatedFetch("/api/doctor/patient-onboarding", { method: "POST", body: form });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || "Unable to onboard patient.");
