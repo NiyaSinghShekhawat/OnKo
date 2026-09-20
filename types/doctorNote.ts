@@ -1,0 +1,1 @@
+export interface DoctorNote{noteId:string;doctorId:string;patientId:string;title:string;content:string;createdAt:string;updatedAt:string;visibility:"private";}
