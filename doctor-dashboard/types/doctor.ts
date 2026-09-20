@@ -7,8 +7,7 @@ export type DoctorNavItem =
   | "care-plans"
   | "alerts"
   | "caregivers"
-  | "audit"
-  | "onboarding";
+  | "audit";
 
 export interface DoctorNavEntry {
   id: DoctorNavItem;
