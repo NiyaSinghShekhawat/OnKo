@@ -1,0 +1,1 @@
+export interface ReportAnalysis{analysisId:string;reportId:string;patientId:string;doctorId:string;generatedAt:string;model:string;summary:string;observations:string[];documentedChanges:string[];limitations:string[];reviewStatus:"pending-review"|"reviewed"|"dismissed";reviewNote?:string;}
