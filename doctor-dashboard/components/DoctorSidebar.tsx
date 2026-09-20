@@ -7,12 +7,15 @@ const navItems: Array<DoctorNavEntry & { href: string; match?: string }> = [
   { id: "overview", label: "Overview", icon: "⌂", href: "/doctor", match: "/doctor" },
   { id: "ai", label: "AI Command Center", icon: "✦", href: "/doctor/ai", match: "/doctor/ai" },
   { id: "patients", label: "Patient Management", icon: "♙", href: "/doctor#patients" },
-  { id: "queries", label: "Queries / Triage", icon: "?", href: "/doctor#queries" },
-  { id: "reports", label: "Reports", icon: "▤", href: "/doctor#reports" },
-  { id: "care-plans", label: "Care Plans", icon: "✓", href: "/doctor#care-plans" },
+  { id: "progress", label: "Progress", icon: "◫", href: "/doctor/progress", match: "/doctor/progress" },
+  { id: "appointments", label: "Appointments", icon: "◷", href: "/doctor/appointments", match: "/doctor/appointments" },
+  { id: "queries", label: "Queries / Triage", icon: "?", href: "/doctor/queries", match: "/doctor/queries" },
+  { id: "reports", label: "Reports", icon: "▤", href: "/doctor/reports", match: "/doctor/reports" },
+  { id: "care-plans", label: "Care Plans", icon: "✓", href: "/doctor/care-plans", match: "/doctor/care-plans" },
   { id: "alerts", label: "Alerts & Signals", icon: "!", href: "/doctor/signals", match: "/doctor/signals" },
   { id: "caregivers", label: "Caregivers", icon: "♧", href: "/doctor#caregivers" },
-  { id: "audit", label: "Audit / Emergency", icon: "◈", href: "/doctor#audit" },
+  { id: "notifications", label: "Notifications", icon: "●", href: "/doctor/notifications", match: "/doctor/notifications" },
+  { id: "audit", label: "Audit / Emergency", icon: "◈", href: "/doctor/emergency", match: "/doctor/emergency" },
 ];
 
 export default function DoctorSidebar() {
