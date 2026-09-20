@@ -1,18 +1,23 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import type { DoctorNavEntry } from "../types/doctor";
 
-const navItems: DoctorNavEntry[] = [
-  { id: "overview", label: "Overview", icon: "⌂" },
-  { id: "ai", label: "AI Command Center", icon: "✦" },
-  { id: "patients", label: "Patient Management", icon: "♙" },
-  { id: "queries", label: "Queries / Triage", icon: "?" },
-  { id: "reports", label: "Reports", icon: "▤" },
-  { id: "care-plans", label: "Care Plans", icon: "✓" },
-  { id: "alerts", label: "Alerts & Signals", icon: "!" },
-  { id: "caregivers", label: "Caregivers", icon: "♧" },
-  { id: "audit", label: "Audit / Emergency", icon: "◈" },
+const navItems: Array<DoctorNavEntry & { href: string; match?: string }> = [
+  { id: "overview", label: "Overview", icon: "⌂", href: "/doctor", match: "/doctor" },
+  { id: "ai", label: "AI Command Center", icon: "✦", href: "/doctor/ai", match: "/doctor/ai" },
+  { id: "patients", label: "Patient Management", icon: "♙", href: "/doctor#patients" },
+  { id: "queries", label: "Queries / Triage", icon: "?", href: "/doctor#queries" },
+  { id: "reports", label: "Reports", icon: "▤", href: "/doctor#reports" },
+  { id: "care-plans", label: "Care Plans", icon: "✓", href: "/doctor#care-plans" },
+  { id: "alerts", label: "Alerts & Signals", icon: "!", href: "/doctor/signals", match: "/doctor/signals" },
+  { id: "caregivers", label: "Caregivers", icon: "♧", href: "/doctor#caregivers" },
+  { id: "audit", label: "Audit / Emergency", icon: "◈", href: "/doctor#audit" },
 ];
 
 export default function DoctorSidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="doctor-sidebar">
       <div className="doctor-brand">
@@ -26,18 +31,25 @@ export default function DoctorSidebar() {
       <div className="doctor-section-label">Doctor workspace</div>
 
       <nav className="doctor-sidebar-nav" aria-label="Doctor dashboard">
-        {navItems.map((item, index) => (
-          <a
-            key={item.id}
-            href={item.id === "overview" ? "/doctor" : `#${item.id}`}
-            className={`doctor-sidebar-link${index === 0 ? " active" : ""}`}
-          >
-            <span className="doctor-sidebar-icon" aria-hidden="true">
-              {item.icon}
-            </span>
-            <span>{item.label}</span>
-          </a>
-        ))}
+        {navItems.map((item) => {
+          const active = item.match
+            ? pathname === item.match
+            : false;
+
+          return (
+            <a
+              key={item.id}
+              href={item.href}
+              className={`doctor-sidebar-link${active ? " active" : ""}`}
+              aria-current={active ? "page" : undefined}
+            >
+              <span className="doctor-sidebar-icon" aria-hidden="true">
+                {item.icon}
+              </span>
+              <span>{item.label}</span>
+            </a>
+          );
+        })}
       </nav>
 
       <div className="doctor-security">
