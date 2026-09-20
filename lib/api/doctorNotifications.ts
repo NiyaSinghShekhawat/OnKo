@@ -1,0 +1,4 @@
+import type {DoctorNotification} from "@/types/doctorNotification";
+import {authenticatedFetch} from "./authenticatedFetch";
+export async function fetchDoctorNotifications():Promise<DoctorNotification[]>{const r=await authenticatedFetch("/api/doctor/notifications");if(!r.ok)throw new Error("Unable to load doctor notifications.");return(await r.json()).data as DoctorNotification[];}
+export async function markDoctorNotificationRead(notificationId:string):Promise<DoctorNotification>{const r=await authenticatedFetch("/api/doctor/notifications",{method:"PATCH",body:JSON.stringify({notificationId})});if(!r.ok)throw new Error("Unable to mark notification as read.");return(await r.json()).data as DoctorNotification;}
