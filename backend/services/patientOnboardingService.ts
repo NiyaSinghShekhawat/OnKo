@@ -40,34 +40,21 @@ export async function onboardPatient(
 
   const email = generatedEmail(patientId);
   const temporaryPassword = generatedPassword();
-  const user = await auth.createUser({
-    email,
-    password: temporaryPassword,
-    displayName: input.name.trim(),
-  });
+  const user = await auth.createUser({ email, password: temporaryPassword, displayName: input.name.trim() });
 
   try {
     await auth.setCustomUserClaims(user.uid, { role: "patient", patientId });
-
     const now = new Date().toISOString();
+
     const patient = defined({
-      patientId,
-      name: input.name.trim(),
+      patientId, name: input.name.trim(),
       age: typeof input.age === "number" ? input.age : undefined,
-      diagnosisLabel: clean(input.diagnosisLabel),
-      currentCarePhase: input.currentCarePhase,
-      doctorId,
-      journeyProgress: Math.max(0, Math.min(100, Number(input.journeyProgress) || 0)),
-      lastUpdatedAt: now,
-      authUid: user.uid,
-      email,
-      dateOfBirth: clean(input.dateOfBirth),
-      gender: clean(input.gender),
-      phone: clean(input.phone),
-      address: clean(input.address),
-      emergencyContactName: clean(input.emergencyContactName),
-      emergencyContactPhone: clean(input.emergencyContactPhone),
-      accountStatus: "active",
+      diagnosisLabel: clean(input.diagnosisLabel), currentCarePhase: input.currentCarePhase,
+      doctorId, journeyProgress: Math.max(0, Math.min(100, Number(input.journeyProgress) || 0)),
+      lastUpdatedAt: now, authUid: user.uid, email,
+      dateOfBirth: clean(input.dateOfBirth), gender: clean(input.gender), phone: clean(input.phone),
+      address: clean(input.address), emergencyContactName: clean(input.emergencyContactName),
+      emergencyContactPhone: clean(input.emergencyContactPhone), accountStatus: "active",
     }) as Patient & Record<string, unknown>;
 
     const batch = db.batch();
@@ -75,28 +62,30 @@ export async function onboardPatient(
 
     for (const medicine of input.medicines ?? []) {
       if (!medicine.name?.trim()) continue;
-      batch.set(db.collection("medicines").doc(randomUUID()), defined({
-        medicineId: randomUUID(), patientId, name: medicine.name.trim(),
-        dosage: medicine.dosage?.trim() || "", frequency: medicine.frequency?.trim() || "",
-        instructions: medicine.instructions?.trim() || "", sideEffects: medicine.sideEffects ?? [],
-        startDate: medicine.startDate || now.slice(0, 10), endDate: clean(medicine.endDate), status: "active",
+      const medicineId = randomUUID();
+      batch.set(db.collection("medicines").doc(medicineId), defined({
+        medicineId, patientId, name: medicine.name.trim(), dosage: medicine.dosage?.trim() || "",
+        frequency: medicine.frequency?.trim() || "", instructions: medicine.instructions?.trim() || "",
+        sideEffects: medicine.sideEffects ?? [], startDate: medicine.startDate || now.slice(0, 10),
+        endDate: clean(medicine.endDate), status: "active",
       }));
     }
 
     for (const procedure of input.procedures ?? []) {
       if (!procedure.name?.trim()) continue;
-      batch.set(db.collection("procedures").doc(randomUUID()), defined({
-        procedureId: randomUUID(), patientId, name: procedure.name.trim(),
-        date: procedure.date || now.slice(0, 10), reason: clean(procedure.reason), purpose: clean(procedure.purpose),
-        details: clean(procedure.details), followUpDate: clean(procedure.followUpDate), notes: clean(procedure.notes),
-        status: procedure.status || "scheduled",
+      const procedureId = randomUUID();
+      batch.set(db.collection("procedures").doc(procedureId), defined({
+        procedureId, patientId, name: procedure.name.trim(), date: procedure.date || now.slice(0, 10),
+        reason: clean(procedure.reason), purpose: clean(procedure.purpose), details: clean(procedure.details),
+        followUpDate: clean(procedure.followUpDate), notes: clean(procedure.notes), status: procedure.status || "scheduled",
       }));
     }
 
     for (const appointment of input.appointments ?? []) {
       if (!appointment.title?.trim()) continue;
-      batch.set(db.collection("appointments").doc(randomUUID()), defined({
-        appointmentId: randomUUID(), patientId, doctorId, title: appointment.title.trim(),
+      const appointmentId = randomUUID();
+      batch.set(db.collection("appointments").doc(appointmentId), defined({
+        appointmentId, patientId, doctorId, title: appointment.title.trim(),
         date: appointment.date || now.slice(0, 10), time: appointment.time || "",
         location: clean(appointment.location), status: appointment.status || "scheduled",
         instructions: clean(appointment.instructions),
@@ -105,29 +94,29 @@ export async function onboardPatient(
 
     for (const milestone of input.milestones ?? []) {
       if (!milestone.title?.trim()) continue;
-      batch.set(db.collection("milestones").doc(randomUUID()), defined({
-        milestoneId: randomUUID(), patientId, title: milestone.title.trim(),
-        description: clean(milestone.description), dueDate: milestone.dueDate || now.slice(0, 10),
-        status: milestone.status || "pending",
+      const milestoneId = randomUUID();
+      batch.set(db.collection("milestones").doc(milestoneId), defined({
+        milestoneId, patientId, title: milestone.title.trim(), description: clean(milestone.description),
+        dueDate: milestone.dueDate || now.slice(0, 10), status: milestone.status || "pending",
       }));
     }
 
     for (const caregiver of input.caregivers ?? []) {
       if (!caregiver.name?.trim()) continue;
-      batch.set(db.collection("caregivers").doc(randomUUID()), defined({
-        caregiverId: randomUUID(), patientId, name: caregiver.name.trim(),
-        relationship: caregiver.relationship?.trim() || "", contact: clean(caregiver.contact),
-        accessStatus: "invited", permissions: caregiver.permissions ?? [],
+      const caregiverId = randomUUID();
+      batch.set(db.collection("caregivers").doc(caregiverId), defined({
+        caregiverId, patientId, name: caregiver.name.trim(), relationship: caregiver.relationship?.trim() || "",
+        contact: clean(caregiver.contact), accessStatus: "invited", permissions: caregiver.permissions ?? [],
       }));
     }
 
     let reportCount = 0;
     for (const report of input.reports ?? []) {
       if (!report.title?.trim()) continue;
-      batch.set(db.collection("reports").doc(randomUUID()), defined({
-        reportId: randomUUID(), patientId, title: report.title.trim(),
-        reportType: clean(report.reportType), uploadedAt: now,
-        fileName: report.title.trim(), status: "uploaded", notes: clean(report.notes),
+      const reportId = randomUUID();
+      batch.set(db.collection("reports").doc(reportId), defined({
+        reportId, patientId, title: report.title.trim(), reportType: clean(report.reportType),
+        uploadedAt: now, fileName: report.title.trim(), status: "uploaded", notes: clean(report.notes),
       }));
       reportCount++;
     }
@@ -163,6 +152,7 @@ export async function onboardPatient(
         caregivers: (input.caregivers ?? []).filter((x) => x.name?.trim()).length,
         reports: reportCount,
       },
+      storagePath: "",
     };
   } catch (error) {
     await auth.deleteUser(user.uid).catch(() => undefined);
