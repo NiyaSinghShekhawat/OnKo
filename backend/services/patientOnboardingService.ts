@@ -31,6 +31,8 @@ export async function onboardPatient(
   const db = getAdminDb();
   const auth = getAdminAuth();
   const storage = getAdminStorage();
+  const bucket = process.env.FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+  const storageBucket = bucket ? storage.bucket(bucket) : storage.bucket();
 
   if (!input.name.trim()) throw new Error("Patient name is required.");
   if (!input.currentCarePhase) throw new Error("Care phase is required.");
@@ -124,7 +126,7 @@ export async function onboardPatient(
     }
 
     const storagePath = `patients/${patientId}/onboarding/profile.json`;
-    await storage.bucket().file(storagePath).save(Buffer.from(JSON.stringify({
+    await storageBucket.file(storagePath).save(Buffer.from(JSON.stringify({
       patientId, doctorId, onboardedAt: now, profile: patient,
       clinicalRecords: {
         medicines: input.medicines ?? [],
@@ -144,7 +146,7 @@ export async function onboardPatient(
       if (file) {
         reportStoragePath = `patients/${patientId}/reports/${Date.now()}-${reportFileName(file.name)}`;
         const buffer = Buffer.from(await file.arrayBuffer());
-        await storage.bucket().file(reportStoragePath).save(buffer, {
+        await storageBucket.file(reportStoragePath).save(buffer, {
           contentType: file.type || "application/octet-stream",
           resumable: false,
         });
