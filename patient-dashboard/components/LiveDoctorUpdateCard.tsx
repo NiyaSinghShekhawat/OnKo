@@ -15,10 +15,10 @@ export function LiveDoctorUpdateCard() {
       void user.getIdTokenResult(true).then((token) => {
         const patientId = typeof token.claims.patientId === "string" ? token.claims.patientId : null;
         if (!patientId) return;
-        const q = query(collection(db, "notifications"), where("patientId", "==", patientId), where("type", "==", "doctor-update"));
+        const q = query(collection(db, "notifications"), where("patientId", "==", patientId));
         unsubscribe = onSnapshot(q, (snapshot) => {
           if (!active) return;
-          const rows = snapshot.docs.map((d) => d.data() as Notification).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          const rows = snapshot.docs.map((d) => d.data() as Notification).filter((n) => n.type === "doctor-update").sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
           setUpdate(rows[0] ?? null);
         });
       }).catch(() => undefined);
