@@ -1,0 +1,3 @@
+import type {Appointment} from "@/types/appointment";import {authenticatedFetch} from "./authenticatedFetch";
+export async function createDoctorAppointment(input:Omit<Appointment,"appointmentId">){const r=await authenticatedFetch("/api/doctor/appointments",{method:"POST",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to schedule appointment.");return(await r.json()).data as Appointment;}
+export async function updateDoctorAppointment(input:Partial<Appointment>&{appointmentId:string}){const r=await authenticatedFetch("/api/doctor/appointments",{method:"PATCH",body:JSON.stringify(input)});if(!r.ok)throw new Error("Unable to update appointment.");return(await r.json()).data as Appointment;}
