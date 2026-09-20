@@ -1,13 +1,14 @@
 export type DoctorNavItem =
-  | "ai"
   | "overview"
+  | "ai"
   | "patients"
   | "queries"
   | "reports"
   | "care-plans"
   | "alerts"
   | "caregivers"
-  | "audit";
+  | "audit"
+  | "onboarding";
 
 export interface DoctorNavEntry {
   id: DoctorNavItem;
